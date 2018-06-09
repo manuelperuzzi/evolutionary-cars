@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://street_tiles.png" type="Texture" id=1]
-[ext_resource path="res://car.svg" type="Texture" id=2]
+[ext_resource path="res://tilemap/sidewalk/street_tiles.png" type="Texture" id=1]
+[ext_resource path="res://tilemap/car/car.svg" type="Texture" id=2]
 
 [node name="tileset_id" type="Node2D"]
 

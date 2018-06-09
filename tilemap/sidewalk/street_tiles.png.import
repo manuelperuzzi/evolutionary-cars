@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/car.svg-a18fec1ef60e67557a89809b1270d253.stex"
+path="res://.import/street_tiles.png-2b529d193493d83905e6ac04415e454e.stex"
 
 [deps]
 
-source_file="res://car.svg"
-source_md5="c735e094a8da867bf7bfd947cc5a3fad"
+source_file="res://tilemap/sidewalk/street_tiles.png"
+source_md5="dcc96a20ef51dea12c2245305d9ad5b5"
 
-dest_files=[ "res://.import/car.svg-a18fec1ef60e67557a89809b1270d253.stex" ]
-dest_md5="2aa1e8f9bd9cf6e1ab6ea54843bcbca9"
+dest_files=[ "res://.import/street_tiles.png-2b529d193493d83905e6ac04415e454e.stex" ]
+dest_md5="da8586108ebcbd693b0e234ff05dee2d"
 
 [params]
 
