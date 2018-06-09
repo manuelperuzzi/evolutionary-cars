@@ -1,0 +1,41 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://car/car.cs" type="Script" id=1]
+[ext_resource path="res://tilemap/car/car.svg" type="Texture" id=2]
+
+[sub_resource type="ImageTexture" id=1]
+
+flags = 7
+storage = 0
+lossy_quality = 0.7
+flags = 7
+size = Vector2( 0, 0 )
+
+[node name="car" type="KinematicBody2D"]
+
+position = Vector2( 40, 60 )
+rotation = 3.14159
+scale = Vector2( 0.3, 0.35 )
+input_pickable = false
+collision_layer = 1
+collision_mask = 1
+collision/safe_margin = 0.08
+script = ExtResource( 1 )
+_sections_unfolded = [ "Transform" ]
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="." index="0"]
+
+scale = Vector2( 0.2, 0.2 )
+texture = ExtResource( 2 )
+normal_map = SubResource( 1 )
+_sections_unfolded = [ "Transform" ]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." index="1"]
+
+build_mode = 0
+polygon = PoolVector2Array( -69.4112, -5.17569, -69.0876, 3.88325, -64.5582, 21.3541, -58.0875, 27.5012, -50.6462, 28.7953, -0.49852, 29.7659, 1.11915, 33.0013, 5.32509, 32.6777, 4.35448, 29.7659, 53.5316, 29.7659, 62.9141, 25.56, 68.0906, 16.5011, 69.3847, 8.08919, 69.0612, -10.0287, 66.1494, -20.7053, 61.6199, -26.2054, 55.4728, -29.7642, 26.6783, -29.7642, 3.38389, -29.7642, 5.32509, -32.9996, 0.148552, -32.9996, -0.822052, -30.0878, -53.2345, -29.1172, -62.617, -24.9112, -66.8229, -15.5288 )
+
+
