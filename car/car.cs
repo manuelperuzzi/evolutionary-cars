@@ -3,20 +3,13 @@ using System;
 
 public class car : KinematicBody2D
 {	
-	bool first = true;
+	int v = 10;
 	
 	public override void _PhysicsProcess(float delta)
     {
-        if (first == true) 
-		{
-			var collisionInfo = MoveAndCollide(new Vector2(100, 0) * delta);
-			//GD.Print("Collider: " + collisionInfo.Collider);
-			first = false;
-		} 
-		/*else 
-		{
-			MoveAndCollide(new Vector2(500, 0) * delta);
-		}*/
+		var collisionInfo = MoveAndCollide(new Vector2(v, 0) * delta);
+		collisionInfo.GetPosition();
+		v += 10;
 	}
 	
     public override void _Ready()
