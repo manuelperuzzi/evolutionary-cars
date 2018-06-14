@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class sensorCar : KinematicBody2D
+public class SensorCar : KinematicBody2D
 {
     const int SENSORS_NUMBER = 5;
 	Dictionary<int, RayCast2D> sensors = new Dictionary<int, RayCast2D>();

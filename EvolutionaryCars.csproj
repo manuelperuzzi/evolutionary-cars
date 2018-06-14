@@ -49,9 +49,12 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="car\car.cs" />
-    <Compile Include="car\sensorCar.cs" />
+    <Compile Include="car\SensorCar.cs" />
+    <Compile Include="nn\ActivationFunctions.cs" />
+    <Compile Include="nn\NeuralLayer.cs" />
+    <Compile Include="nn\NeuralNetwork.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
