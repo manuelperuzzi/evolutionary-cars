@@ -33,7 +33,7 @@ public class Genotype : IComparable<Genotype>
   /// <summary>
   /// The number of weights stored in this genotype.
   /// </summary>
-  public int weightCount
+  public int WeightCount
   {
     get 
     {
@@ -104,10 +104,17 @@ public class Genotype : IComparable<Genotype>
       throw new ArgumentException("Minimum value cannot exeed maximum value!");
     }
     double range = maxValue - minValue;
-    for (int i = 0; i < this.weightCount; i++)
+    for (int i = 0; i < this.WeightCount; i++)
     {
       this.weights[i] = (RANDOMIZER.NextDouble() * range) + minValue;
     }
+  }
+
+  public double[] GetWeightCopy()
+  {
+    double[] copy = new double[this.WeightCount];
+    Array.Copy(this.weights, copy, this.WeightCount);
+    return copy;
   }
   #endregion
 }
