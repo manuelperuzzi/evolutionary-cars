@@ -53,6 +53,7 @@
     <Compile Include="nn\ActivationFunctions.cs" />
     <Compile Include="nn\NeuralLayer.cs" />
     <Compile Include="nn\NeuralNetwork.cs" />
+    <Compile Include="driver\DriverAgent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />
