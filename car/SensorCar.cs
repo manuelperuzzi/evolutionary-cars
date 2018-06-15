@@ -34,6 +34,7 @@ public class SensorCar : KinematicBody2D, Car
 		this.sensors.Add(60, (RayCast2D) GetNode("ray+60"));
 		this.sensors.Add(-30, (RayCast2D) GetNode("ray-30"));
 		this.sensors.Add(-60, (RayCast2D) GetNode("ray-60"));
+		this.IsAlive = true;
     }
 
 	public override void _PhysicsProcess(float delta)
@@ -42,7 +43,7 @@ public class SensorCar : KinematicBody2D, Car
 		{
 			if (this.Sense()) 
 			{
-				var movementParams = this.Think();
+				var movementParams = this.Think(delta);
 				this.Move(movementParams, delta);
 			}
 			else
@@ -60,14 +61,15 @@ public class SensorCar : KinematicBody2D, Car
 		return !this.IsColliding();
 	}
 
-	private Vector2 Think() 
+	private Vector2 Think(float delta) 
 	{
-		double[] tmpSensorsValues = new double[this.sensorsValues.Count];
+		/*double[] tmpSensorsValues = new double[this.sensorsValues.Count];
 		this.sensorsValues.Values.CopyTo(tmpSensorsValues, 0);
 		double[] movementParams = this.Agent.Think(tmpSensorsValues);
 		var engineForce = movementParams[0];
 		var direction = movementParams[1];
-		return this.TransformMovementParams(engineForce, direction);
+		return this.TransformMovementParams(engineForce, direction, delta);*/
+		return this.TransformMovementParams(100, 0, delta);
 	}
 
 	private void Move(Vector2 movementParams, float delta) 
@@ -96,9 +98,10 @@ public class SensorCar : KinematicBody2D, Car
 		return false;
 	}
 
-	private Vector2 TransformMovementParams(double engineForce, double direction) 
+	private Vector2 TransformMovementParams(double engineForce, double direction, float delta) 
 	{
-		// TODO some computation
-		return new Vector2((float) engineForce, (float) direction);
+		this.Rotation += (float) direction * delta; 
+		Vector2 velocity = new Vector2((float) engineForce, 0).Rotated(this.Rotation);
+		return velocity;
 	}
 }
