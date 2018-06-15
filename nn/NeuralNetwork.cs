@@ -18,6 +18,9 @@ namespace NeuralNetworks
 
         public NeuralNetwork(params uint[] topology)
         {
+            if (topology.Length == 0)
+                throw new ArgumentException("NeuralNetwork constructor: invalid topology");
+
             Layers = new NeuralLayer[topology.Length - 1];
             WeightsCount = 0;
             for (int i = 0; i < Layers.Length; i++)
