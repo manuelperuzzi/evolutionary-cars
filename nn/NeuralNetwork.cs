@@ -10,18 +10,46 @@ namespace NeuralNetworks
             private set;
         }
 
+        public uint WeightsCount
+        {
+            get;
+            private set;
+        }
+
         public NeuralNetwork(params uint[] topology)
         {
+            if (topology.Length == 0)
+                throw new ArgumentException("NeuralNetwork constructor: invalid topology");
+
             Layers = new NeuralLayer[topology.Length - 1];
+            WeightsCount = 0;
             for (int i = 0; i < Layers.Length; i++)
+            {
                 Layers[i] = new NeuralLayer(topology[i], topology[i + 1]);
+                WeightsCount += (topology[i] + 1) * topology[i + 1];
+            }
+        }
+
+        public void SetWeights(double[] weights)
+        {
+            if(weights.Length != WeightsCount)
+                throw new ArgumentException("SetWeights: weights count doesn't match neural network weight count.");
+
+            int currentIndex = 0;
+            for(int i = 0; i < Layers.Length; i++)
+            {
+                double[] subWeights = new double[Layers[i].Weights.Length];
+                Array.Copy(weights, currentIndex, subWeights, 0, subWeights.Length);
+                Layers[i].SetWeights(subWeights);
+                currentIndex += subWeights.Length;
+            }
         }
 
         public void SetRandomWeights(double minValue, double maxValue)
         {
             for (int i = 0; i < Layers.Length; i++)
                 Layers[i].SetRandomWeights(minValue, maxValue);
-        } 
+        }
 
         public double[] ProcessInputs(double[] inputs)
         {
@@ -34,5 +62,6 @@ namespace NeuralNetworks
 
             return outputs;
         }
+
     }
 }
