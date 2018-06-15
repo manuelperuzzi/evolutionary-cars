@@ -27,12 +27,6 @@ namespace NeuralNetworks
             }
         }
 
-        public void SetRandomWeights(double minValue, double maxValue)
-        {
-            for (int i = 0; i < Layers.Length; i++)
-                Layers[i].SetRandomWeights(minValue, maxValue);
-        }
-
         public void SetWeights(double[] weights)
         {
             if(weights.Length != WeightsCount)
@@ -46,6 +40,12 @@ namespace NeuralNetworks
                 Layers[i].SetWeights(subWeights);
                 currentIndex += subWeights.Length;
             }
+        }
+
+        public void SetRandomWeights(double minValue, double maxValue)
+        {
+            for (int i = 0; i < Layers.Length; i++)
+                Layers[i].SetRandomWeights(minValue, maxValue);
         }
 
         public double[] ProcessInputs(double[] inputs)
