@@ -2,23 +2,30 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class SensorCar : KinematicBody2D
+public interface Car
 {
-	const int X_INITIAL_POSITION = 40;
-	const int Y_INITIAL_POSITION = 60;
-	const double COLLISION_THRESHOLD = 3;
+	bool IsAlive { get; }
+	DriverAgent Agent { get; set; }
+	void Restart();
+}
 
-	Dictionary<double, RayCast2D> sensors = new Dictionary<double, RayCast2D>();
-	Dictionary<double, double> sensorsValues = new Dictionary<double, double>(); 
-	public bool IsAlive {
-		get;
-		private set;
-	}
-	/*public Agent agent {
-		get;
-		set;
-	}*/
+public class SensorCar : KinematicBody2D, Car
+{
+	private const int X_INITIAL_POSITION = 40;
+	private const int Y_INITIAL_POSITION = 60;
+	private const double COLLISION_THRESHOLD = 3;
+
+	private Dictionary<double, RayCast2D> sensors = new Dictionary<double, RayCast2D>();
+	private Dictionary<double, double> sensorsValues = new Dictionary<double, double>(); 
+	public bool IsAlive { get; private set; }
+	public DriverAgent Agent { get; set; }
 	
+	public void Restart() 
+	{
+		this.Position = new Vector2(X_INITIAL_POSITION, Y_INITIAL_POSITION);
+		this.IsAlive = true;
+	}
+
     public override void _Ready()
     {
         this.sensors.Add(0, (RayCast2D) GetNode("ray0"));
@@ -27,12 +34,6 @@ public class SensorCar : KinematicBody2D
 		this.sensors.Add(-30, (RayCast2D) GetNode("ray-30"));
 		this.sensors.Add(-60, (RayCast2D) GetNode("ray-60"));
     }
-
-	public void Restart() 
-	{
-		this.Position = new Vector2(X_INITIAL_POSITION, Y_INITIAL_POSITION);
-		this.IsAlive = true;
-	}
 
 	public override void _PhysicsProcess(float delta)
     {
@@ -60,7 +61,9 @@ public class SensorCar : KinematicBody2D
 
 	private Vector2 Think() 
 	{
-		double[] movementParams = /*this.Agent.Think(sensorsValues.Values);*/ new double[2];
+		double[] tmpSensorsValues = new double[this.sensorsValues.Count];
+		this.sensorsValues.Values.CopyTo(tmpSensorsValues, 0);
+		double[] movementParams = this.Agent.Think(tmpSensorsValues);
 		var engineForce = movementParams[0];
 		var direction = movementParams[1];
 		return this.TransformMovementParams(engineForce, direction);
@@ -94,7 +97,7 @@ public class SensorCar : KinematicBody2D
 
 	private Vector2 TransformMovementParams(double engineForce, double direction) 
 	{
-		// some computation
+		// TODO some computation
 		return new Vector2((float) engineForce, (float) direction);
 	}
 }
