@@ -54,7 +54,10 @@
     <Compile Include="nn\NeuralLayer.cs" />
     <Compile Include="nn\NeuralNetwork.cs" />
     <Compile Include="driver\DriverAgent.cs" />
+    <Compile Include="evolution\Genotype.cs" />
+    <Compile Include="evolution\GeneticAlgorithm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RaceManager.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
