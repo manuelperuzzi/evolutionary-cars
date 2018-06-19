@@ -2,6 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// Represents a single genotype, containing weights of a neural network.
+/// </summary>
 public class Genotype : IComparable<Genotype>
 {
     #region members
