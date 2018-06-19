@@ -7,7 +7,7 @@ public interface ICar
 {
 	bool IsAlive { get; }
 	IDriverAgent Agent { get; set; }
-	void Restart(int xInitialPosition, int yInitialPosition);
+	void Restart(float xInitialPosition, float yInitialPosition);
     void Kill();
 }
 
@@ -23,7 +23,7 @@ public class SensorCar : KinematicBody2D, ICar
 	public bool IsAlive { get; private set; }
 	public IDriverAgent Agent { get; set; }
 	
-	public void Restart(int xInitialPosition, int yInitialPosition) 
+	public void Restart(float xInitialPosition, float yInitialPosition) 
 	{
 		this.Position = new Vector2(xInitialPosition, yInitialPosition);
 		this.IsAlive = true;

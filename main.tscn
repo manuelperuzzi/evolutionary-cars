@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=2]
 
-[ext_resource path="res://tracks/track01.tscn" type="PackedScene" id=1]
+[ext_resource path="res://tracks/track01/track01.tscn" type="PackedScene" id=1]
 [ext_resource path="res://car/sensorCar.tscn" type="PackedScene" id=2]
 [ext_resource path="res://RaceManager.cs" type="Script" id=3]
 
@@ -15,5 +15,7 @@ collision_use_kinematic = false
 [node name="RaceManager" type="Node" parent="." index="2"]
 
 script = ExtResource( 3 )
+xInitialPosition = 0
+yInitialPosition = 0
 
 
