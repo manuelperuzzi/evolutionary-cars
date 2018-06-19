@@ -8,6 +8,7 @@ public interface ICar
 	bool IsAlive { get; }
 	IDriverAgent Agent { get; set; }
 	void Restart(int xInitialPosition, int yInitialPosition);
+    void Kill();
 }
 
 public class SensorCar : KinematicBody2D, ICar
@@ -31,12 +32,18 @@ public class SensorCar : KinematicBody2D, ICar
     public override void _Ready()
     {
         this.sensors.Add(0, (RayCast2D) GetNode("ray0"));
-		this.sensors.Add(30, (RayCast2D) GetNode("ray+30"));
-		this.sensors.Add(60, (RayCast2D) GetNode("ray+60"));
-		this.sensors.Add(-30, (RayCast2D) GetNode("ray-30"));
-		this.sensors.Add(-60, (RayCast2D) GetNode("ray-60"));
-		this.IsAlive = true;
+        this.sensors.Add(30, (RayCast2D) GetNode("ray+30"));
+        this.sensors.Add(60, (RayCast2D) GetNode("ray+60"));
+        this.sensors.Add(-30, (RayCast2D) GetNode("ray-30"));
+        this.sensors.Add(-60, (RayCast2D) GetNode("ray-60"));
+        this.IsAlive = true;
         this.Connect("CarDeadSignal", RaceManager.Instance, "OnCarDeath");
+    }
+
+    public void Kill() 
+    {
+        this.IsAlive = false;
+        EmitSignal(nameof(CarDeadSignal));
     }
 
 	public override void _PhysicsProcess(float delta)
@@ -50,8 +57,7 @@ public class SensorCar : KinematicBody2D, ICar
             }
             else
             {
-                this.IsAlive = false;
-                EmitSignal(nameof(CarDeadSignal));
+                this.Kill();
             }
 		}
 	}
@@ -68,13 +74,12 @@ public class SensorCar : KinematicBody2D, ICar
 
 	private Vector2 Think(float delta) 
 	{
-		/*double[] tmpSensorsValues = new double[this.sensorsValues.Count];
+		double[] tmpSensorsValues = new double[this.sensorsValues.Count];
 		this.sensorsValues.Values.CopyTo(tmpSensorsValues, 0);
 		double[] movementParams = this.Agent.Think(tmpSensorsValues);
 		var engineForce = movementParams[0];
 		var direction = movementParams[1];
-		return this.TransformMovementParams(engineForce, direction, delta);*/
-		return this.TransformMovementParams(100, 0, delta);
+		return this.TransformMovementParams(engineForce, direction, delta);
 	}
 
 	private void Move(Vector2 movementParams, float delta) 
