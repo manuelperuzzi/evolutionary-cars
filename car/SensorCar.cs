@@ -3,27 +3,28 @@ using System;
 using System.Collections.Generic;
 using CarDrivers;
 
-public interface Car
+public interface ICar
 {
 	bool IsAlive { get; }
-	DriverAgent Agent { get; set; }
-	void Restart();
+	IDriverAgent Agent { get; set; }
+	void Restart(int xInitialPosition, int yInitialPosition);
 }
 
-public class SensorCar : KinematicBody2D, Car
+public class SensorCar : KinematicBody2D, ICar
 {
-	private const int X_INITIAL_POSITION = 40;
-	private const int Y_INITIAL_POSITION = 60;
+    [Signal]
+    private delegate void CarDeadSignal();
+
 	private const double COLLISION_THRESHOLD = 3;
 
 	private Dictionary<double, RayCast2D> sensors = new Dictionary<double, RayCast2D>();
 	private Dictionary<double, double> sensorsValues = new Dictionary<double, double>(); 
 	public bool IsAlive { get; private set; }
-	public DriverAgent Agent { get; set; }
+	public IDriverAgent Agent { get; set; }
 	
-	public void Restart() 
+	public void Restart(int xInitialPosition, int yInitialPosition) 
 	{
-		this.Position = new Vector2(X_INITIAL_POSITION, Y_INITIAL_POSITION);
+		this.Position = new Vector2(xInitialPosition, yInitialPosition);
 		this.IsAlive = true;
 	}
 
@@ -35,19 +36,23 @@ public class SensorCar : KinematicBody2D, Car
 		this.sensors.Add(-30, (RayCast2D) GetNode("ray-30"));
 		this.sensors.Add(-60, (RayCast2D) GetNode("ray-60"));
 		this.IsAlive = true;
+        this.Connect("CarDeadSignal", RaceManager.Instance, "OnCarDeath");
     }
 
 	public override void _PhysicsProcess(float delta)
     {
 		if (IsAlive) 
 		{
-			if (this.Sense()) 
-			{
-				var movementParams = this.Think(delta);
-				this.Move(movementParams, delta);
-			}
-			else
-				this.IsAlive = false;
+            if (this.Sense())
+            {
+                var movementParams = this.Think(delta);
+                this.Move(movementParams, delta);
+            }
+            else
+            {
+                this.IsAlive = false;
+                EmitSignal(nameof(CarDeadSignal));
+            }
 		}
 	}
 

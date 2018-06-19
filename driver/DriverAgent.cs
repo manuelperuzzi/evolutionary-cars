@@ -1,27 +1,25 @@
-using System;
-using System.Collections.Generic;
 using NeuralNetworks;
 
 namespace CarDrivers
 {
-    public interface DriverAgent
+    public interface IDriverAgent
     {
-        //Genotype Genotype { get; }
+        Genotype Genotype { get; }
         double[] Think(double[] sensorsValues);
-        void UpdateKnoledge(/*Genotype genotype*/);
+        void UpdateKnoledge(Genotype genotype);
     }
 
-    public class DriverAgentImpl : DriverAgent
+    public class DriverAgent : IDriverAgent
     {
         private static readonly uint[] NEURAL_NETWORK_TOPOLOGY = new uint[] {5, 3, 4, 2}; 
 
-        //Genotype Genotype { get; private set; }
+        public Genotype Genotype { get; private set; }
         private NeuralNetwork neuralNetwork;
 
-        public DriverAgentImpl(/*Genotype genotype*/) 
+        public DriverAgent(Genotype genotype) 
         {
             this.neuralNetwork = new NeuralNetwork(NEURAL_NETWORK_TOPOLOGY);
-            this.UpdateKnoledge(/*Genotype genotype*/);
+            this.UpdateKnoledge(genotype);
         }
 
         public double[] Think(double[] sensorsValues) 
@@ -29,10 +27,10 @@ namespace CarDrivers
             return neuralNetwork.ProcessInputs(sensorsValues);
         }
 
-        public void UpdateKnoledge(/*Genotype genotype*/) 
+        public void UpdateKnoledge(Genotype genotype) 
         {
-            //this.Genotype = genotype;
-            //this.neuralNetwork.SetWeights(this.Genotype.GetWeightCopy());
+            this.Genotype = genotype;
+            this.neuralNetwork.SetWeights(this.Genotype.GetWeightCopy());
         }
     }
 }
