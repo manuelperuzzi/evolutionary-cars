@@ -8,7 +8,7 @@ public interface ICar
 	bool IsAlive { get; }
 	IDriverAgent Agent { get; set; }
 	void Restart(int xInitialPosition, int yInitialPosition);
-  void Kill();
+    void Kill();
 }
 
 public class SensorCar : KinematicBody2D, ICar
@@ -29,36 +29,36 @@ public class SensorCar : KinematicBody2D, ICar
 		this.IsAlive = true;
 	}
 
-  public override void _Ready()
-  {
-    this.sensors.Add(0, (RayCast2D) GetNode("ray0"));
-    this.sensors.Add(30, (RayCast2D) GetNode("ray+30"));
-    this.sensors.Add(60, (RayCast2D) GetNode("ray+60"));
-    this.sensors.Add(-30, (RayCast2D) GetNode("ray-30"));
-    this.sensors.Add(-60, (RayCast2D) GetNode("ray-60"));
-    this.IsAlive = true;
-    this.Connect("CarDeadSignal", RaceManager.Instance, "OnCarDeath");
-  }
+    public override void _Ready()
+    {
+        this.sensors.Add(0, (RayCast2D) GetNode("ray0"));
+        this.sensors.Add(30, (RayCast2D) GetNode("ray+30"));
+        this.sensors.Add(60, (RayCast2D) GetNode("ray+60"));
+        this.sensors.Add(-30, (RayCast2D) GetNode("ray-30"));
+        this.sensors.Add(-60, (RayCast2D) GetNode("ray-60"));
+        this.IsAlive = true;
+        this.Connect("CarDeadSignal", RaceManager.Instance, "OnCarDeath");
+    }
 
-  public void Kill() 
-  {
-    this.IsAlive = false;
-    EmitSignal(nameof(CarDeadSignal));
-  }
+    public void Kill() 
+    {
+        this.IsAlive = false;
+        EmitSignal(nameof(CarDeadSignal));
+    }
 
 	public override void _PhysicsProcess(float delta)
-  {
+    {
 		if (IsAlive) 
 		{
-      if (this.Sense())
-      {
-        var movementParams = this.Think(delta);
-        this.Move(movementParams, delta);
-      }
-      else
-      {
-        this.Kill();
-      }
+            if (this.Sense())
+            {
+                var movementParams = this.Think(delta);
+                this.Move(movementParams, delta);
+            }
+            else
+            {
+                this.Kill();
+            }
 		}
 	}
 
