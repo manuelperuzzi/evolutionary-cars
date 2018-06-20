@@ -3,15 +3,7 @@ using System;
 using System.Collections.Generic;
 using CarDrivers;
 
-public interface ICar
-{
-	bool IsAlive { get; }
-	IDriverAgent Agent { get; set; }
-	void Restart(float xInitialPosition, float yInitialPosition);
-    void Kill();
-}
-
-public class SensorCar : KinematicBody2D, ICar
+public class SensorCar : KinematicBody2D
 {
     [Signal]
     private delegate void CarDeadSignal();
@@ -20,13 +12,16 @@ public class SensorCar : KinematicBody2D, ICar
 
 	private Dictionary<double, RayCast2D> sensors = new Dictionary<double, RayCast2D>();
 	private Dictionary<double, double> sensorsValues = new Dictionary<double, double>(); 
-	public bool IsAlive { get; private set; }
+
+	private volatile bool _isAlive = false;
+	public bool IsAlive { get { return _isAlive; } }
 	public IDriverAgent Agent { get; set; }
 	
 	public void Restart(float xInitialPosition, float yInitialPosition) 
 	{
-		this.Position = new Vector2(xInitialPosition, yInitialPosition);
-		this.IsAlive = true;
+		this.GlobalPosition = new Vector2(xInitialPosition, yInitialPosition);
+		this.Rotation = 0;
+		this._isAlive = true;
 	}
 
     public override void _Ready()
@@ -36,19 +31,18 @@ public class SensorCar : KinematicBody2D, ICar
         this.sensors.Add(60, (RayCast2D) GetNode("ray+60"));
         this.sensors.Add(-30, (RayCast2D) GetNode("ray-30"));
         this.sensors.Add(-60, (RayCast2D) GetNode("ray-60"));
-        this.IsAlive = true;
         this.Connect("CarDeadSignal", RaceManager.Instance, "OnCarDeath");
     }
 
     public void Kill() 
     {
-        this.IsAlive = false;
+        this._isAlive = false;
         EmitSignal(nameof(CarDeadSignal));
     }
 
 	public override void _PhysicsProcess(float delta)
     {
-		if (IsAlive) 
+		if (this._isAlive) 
 		{
             if (this.Sense())
             {
@@ -110,8 +104,8 @@ public class SensorCar : KinematicBody2D, ICar
 
 	private Vector2 TransformMovementParams(double engineForce, double direction, float delta) 
 	{
-		this.Rotation += (float) direction * delta; 
-		Vector2 velocity = new Vector2((float) engineForce, 0).Rotated(this.Rotation);
+		this.Rotation += (float) (direction - 0.5) * delta; 
+		Vector2 velocity = new Vector2((float) engineForce * 100, 0).Rotated(this.Rotation);
 		return velocity;
 	}
 }
