@@ -3,13 +3,14 @@ using CarDrivers;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Linq;
 
 public class RaceManager : Node
 {
     public delegate void AllCarsDeadEvent();
     public event AllCarsDeadEvent AllCarsDead;
 
-    private static readonly RaceManager _instance = new RaceManager();
+    private static RaceManager _instance;
     private static readonly String mainPath = "/root/Main";
     private static readonly String trackPath = mainPath + "/Track01";
     private static readonly int timeThreshold = 10000;
@@ -29,31 +30,20 @@ public class RaceManager : Node
 
     public void SetupCars(IDriverAgent[] agents)
     {
-        if(raceCars.Count == 0)
-        {
-            var mainNode = GetNode(mainPath);
-            for (int i = 0; i < agents.Length; i++)
-            {
-                SensorCar car = new SensorCar();
-                raceCars.Add(car, -1);
-                mainNode.AddChild(car);
-            }
-        }
-
         if (raceCars.Count != agents.Length)
             throw new ArgumentException("SetupCars: the number of agents does not match the number of racing cars");
 
         int count = 0;
-        foreach(SensorCar car in raceCars.Keys)
+        foreach(SensorCar car in raceCars.Keys.ToList())
             car.Agent = agents[count++];
     }
 
     public void Restart()
     {
         aliveCars = raceCars.Count;
-        foreach (SensorCar car in raceCars.Keys)
+        foreach (SensorCar car in raceCars.Keys.ToList())
         {
-            raceCars[car] = -1;
+            raceCars[car] = 0;
             car.Restart(checkpoints[0].GlobalPosition.x, checkpoints[0].GlobalPosition.y);
             timeElapsed = System.Environment.TickCount;
         }
@@ -61,6 +51,16 @@ public class RaceManager : Node
 
     public override void _Ready()
     {
+        _instance = this;
+        
+        var mainNode = (Main) GetNode(mainPath);
+        for (int i = 0; i < mainNode.carsNumber; i++) {
+            var carScene = (PackedScene) ResourceLoader.Load("res://car/sensorCar.tscn");
+            SensorCar sensorCar = (SensorCar) carScene.Instance();
+            raceCars.Add(sensorCar, 0);
+            CallDeferred("AddCar", mainNode, sensorCar);
+        }
+        
         var tmp = GetNode(trackPath).GetChildren();
         for (int i = 0; i < tmp.Length; i++)
             checkpoints.Add(i, (Checkpoint)tmp[i]);
@@ -73,18 +73,22 @@ public class RaceManager : Node
         {
             if (System.Environment.TickCount - timeElapsed > timeThreshold)
             {
-                foreach (SensorCar car in raceCars.Keys)
+                foreach (SensorCar car in raceCars.Keys.ToList())
                     if (car.IsAlive)
                         car.Kill();
             }
             else
             {
-                foreach (SensorCar car in raceCars.Keys)
+                foreach (SensorCar car in raceCars.Keys.ToList())
                     if (car.IsAlive)
                         UpdateCarEvaluation(car);
             }       
             
         }
+    }
+
+    private void AddCar(Node parent, SensorCar car) {
+        parent.AddChild(car);
     }
 
     private void UpdateCarEvaluation(SensorCar car)
