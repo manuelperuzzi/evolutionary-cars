@@ -10,7 +10,7 @@ public class Controller
     private static readonly Controller _instance = new Controller();
 
     private static readonly int max_iter = 500;
-    private static readonly int genotypeDimension = 100;
+    private static readonly int genotypeDimension = 47;//100;
 
     private GeneticAlgorithm geneticAlgorithm;
 
