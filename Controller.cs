@@ -13,6 +13,7 @@ public class Controller
     private static readonly int genotypeDimension = 47;//100;
 
     private GeneticAlgorithm geneticAlgorithm;
+    private bool firstGeneration;
 
     private Controller() { }
 
@@ -35,6 +36,7 @@ public class Controller
         this.geneticAlgorithm = new GeneticAlgorithm(genotypeDimension, populationSize);
         this.geneticAlgorithm.InitializePopulation();
         RaceManager.Instance.AllCarsDead += this.CarEvolution;
+        this.firstGeneration = true;
         this.CarEvolution();
     }
 
@@ -42,8 +44,10 @@ public class Controller
     {
         if (this.geneticAlgorithm.GenerationCount < max_iter)
         {
-            if (this.geneticAlgorithm.GenerationCount > 1) // generation 1 must not be evolved!
+            if (!this.firstGeneration) // generation 1 must not be evolved!
                 this.geneticAlgorithm.Evolution();
+            else 
+                this.firstGeneration = false;
             RaceManager.Instance.SetupCars(this.CreateAgents(this.geneticAlgorithm.CurrentPopulation));
             RaceManager.Instance.Restart();
         }
