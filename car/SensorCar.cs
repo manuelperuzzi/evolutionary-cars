@@ -89,7 +89,7 @@ public class SensorCar : KinematicBody2D
 			return collisionPoint.DistanceTo(this.sensors[angle].GlobalPosition);
 		} 
 		else 
-			return Double.MaxValue;
+			return 250.0;
 	}
 
 	private bool IsColliding() 
@@ -104,7 +104,7 @@ public class SensorCar : KinematicBody2D
 
 	private Vector2 TransformMovementParams(double engineForce, double direction, float delta) 
 	{
-		this.Rotation += (float) (direction - 0.5) * delta; 
+		this.Rotation += (float) (direction * 2 - 1) * delta; 
 		Vector2 velocity = new Vector2((float) engineForce * 100, 0).Rotated(this.Rotation);
 		return velocity;
 	}
