@@ -12,8 +12,7 @@ public class RaceManager : Node
 
     private static RaceManager _instance;
     private static readonly String mainPath = "/root/Main";
-    private static readonly String trackPath = mainPath + "/Track01";
-    private static readonly int timeThreshold = 10000;
+    private static readonly int timeThreshold = 5000;
     private static readonly double distanceThreshold = 20;
 
     private Dictionary<SensorCar, int> raceCars = new Dictionary<SensorCar, int>();
@@ -22,8 +21,35 @@ public class RaceManager : Node
     private int timeElapsed = 0;
 
     private int furthestCheckpointReached = 0;
-    
-    private RaceManager() { }
+
+    public override void _Ready()
+    {
+        _instance = this;
+        
+        var mainNode = (Main) GetNode(mainPath);
+        this.LoadTrack(mainNode, mainNode.trackScenePath);
+        this.LoadCars(mainNode, mainNode.carScenePath, mainNode.carsNumber);
+    }
+
+    public override void _PhysicsProcess(float delta)
+    {
+        if (aliveCars > 0)
+        {
+            if (System.Environment.TickCount - timeElapsed > timeThreshold)
+            {
+                foreach (SensorCar car in raceCars.Keys.ToList())
+                    if (car.IsAlive)
+                        car.Kill();
+            }
+            else
+            {
+                foreach (SensorCar car in raceCars.Keys.ToList())
+                    if (car.IsAlive)
+                        UpdateCarEvaluation(car);
+            }       
+            
+        }
+    }
 
     public static RaceManager Instance
     {
@@ -52,46 +78,38 @@ public class RaceManager : Node
         this.furthestCheckpointReached = 0;
     }
 
-    public override void _Ready()
+    private void LoadTrack(Node parent, string trackScenePath) 
     {
-        _instance = this;
+        var trackScene = (PackedScene) ResourceLoader.Load(trackScenePath);
+        TileMap track = (TileMap) trackScene.Instance();
         
-        var mainNode = (Main) GetNode(mainPath);
-        for (int i = 0; i < mainNode.carsNumber; i++) {
-            var carScene = (PackedScene) ResourceLoader.Load("res://car/sensorCar.tscn");
-            SensorCar sensorCar = (SensorCar) carScene.Instance();
-            raceCars.Add(sensorCar, 0);
-            CallDeferred("AddCar", mainNode, sensorCar);
-        }
-        
-        var tmp = GetNode(trackPath).GetChildren();
-        for (int i = 0; i < tmp.Length; i++)
-            checkpoints.Add(i, (Checkpoint)tmp[i]);
+        CallDeferred("AddTrack", parent, track);
+
+        var checkpointNodes = track.GetChildren();
+        for (int i = 0; i < checkpointNodes.Length; i++) 
+            checkpoints.Add(i, (Checkpoint)checkpointNodes[i]);
         SetCheckpointScores();
     }
 
-    public override void _PhysicsProcess(float delta)
+    private void AddTrack(Node parent, TileMap track) 
     {
-        if (aliveCars > 0)
-        {
-            if (System.Environment.TickCount - timeElapsed > timeThreshold)
-            {
-                foreach (SensorCar car in raceCars.Keys.ToList())
-                    if (car.IsAlive)
-                        car.Kill();
-            }
-            else
-            {
-                foreach (SensorCar car in raceCars.Keys.ToList())
-                    if (car.IsAlive)
-                        UpdateCarEvaluation(car);
-            }       
-            
+        parent.AddChild(track);
+    }
+
+    private void LoadCars(Node parent, string carScenePath, int carsNumber) 
+    {
+        for (int i = 0; i < carsNumber; i++) {
+            var carScene = (PackedScene) ResourceLoader.Load(carScenePath);
+            SensorCar car = (SensorCar) carScene.Instance();
+            raceCars.Add(car, 0);
+            CallDeferred("AddCar", parent, car);
         }
     }
 
-    private void AddCar(Node parent, SensorCar car) {
+    private void AddCar(Node parent, SensorCar car) 
+    {
         parent.AddChild(car);
+        car.GlobalPosition = checkpoints[0].GlobalPosition;
     }
 
     private void UpdateCarEvaluation(SensorCar car)
