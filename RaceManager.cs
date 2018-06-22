@@ -98,15 +98,11 @@ public class RaceManager : Node
     {
         if(raceCars[car] < checkpoints.Count - 1)
         {
-            Checkpoint currentCheckpoint = checkpoints[raceCars[car]];
             Checkpoint checkpointToReach = checkpoints[raceCars[car] + 1];
             double distanceToCheckpoint = car.GlobalPosition.DistanceTo(checkpointToReach.GlobalPosition);
             if (distanceToCheckpoint < distanceThreshold)
             {   
                 raceCars[car] = raceCars[car] + 1;
-                currentCheckpoint = checkpoints[raceCars[car]];
-                checkpointToReach = checkpoints[raceCars[car] + 1];
-                distanceToCheckpoint = car.GlobalPosition.DistanceTo(checkpointToReach.GlobalPosition);
                 if (raceCars[car] > furthestCheckpointReached)
                 {
                     this.furthestCheckpointReached = raceCars[car];
@@ -114,8 +110,18 @@ public class RaceManager : Node
                 }
                 
             }
-            double distanceBetweenCheckpoints = currentCheckpoint.GlobalPosition.DistanceTo(checkpointToReach.GlobalPosition);
-            double currentScore = checkpoints[raceCars[car]].Score + (distanceBetweenCheckpoints - distanceToCheckpoint);
+
+            double currentScore;
+            if (raceCars[car] == checkpoints.Count - 1)
+                currentScore = checkpoints[raceCars[car]].Score;
+            else
+            {
+                Checkpoint currentCheckpoint = checkpoints[raceCars[car]];
+                double distanceBetweenCheckpoints = currentCheckpoint.GlobalPosition.DistanceTo(checkpointToReach.GlobalPosition);
+                checkpointToReach = checkpoints[raceCars[car] + 1];
+                distanceToCheckpoint = car.GlobalPosition.DistanceTo(checkpointToReach.GlobalPosition);
+                currentScore = checkpoints[raceCars[car]].Score + (distanceBetweenCheckpoints - distanceToCheckpoint);
+            }
 
             car.Agent.Genotype.Evaluation = Math.Max(0, currentScore);
         }
