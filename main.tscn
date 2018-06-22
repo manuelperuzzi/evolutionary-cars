@@ -1,20 +1,49 @@
 [gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Main.cs" type="Script" id=1]
-[ext_resource path="res://tracks/track01/track01.tscn" type="PackedScene" id=2]
-[ext_resource path="res://RaceManager.cs" type="Script" id=3]
+[ext_resource path="res://RaceManager.cs" type="Script" id=2]
+[ext_resource path="res://StartButton.cs" type="Script" id=3]
 
-[node name="Main" type="Node2D" index="0"]
+[node name="Main" type="Node2D"]
 
 script = ExtResource( 1 )
-carsNumber = 20
+carScenePath = "res://car/sensorCar.tscn"
+trackScenePath = "res://tracks/track02/track02.tscn"
+carsNumber = 50
 
-[node name="Track01" parent="." index="0" instance=ExtResource( 2 )]
+[node name="RaceManager" type="Node" parent="." index="0"]
 
-collision_use_kinematic = false
+script = ExtResource( 2 )
 
-[node name="RaceManager" type="Node" parent="." index="1"]
+[node name="Control" type="Node2D" parent="." index="1"]
 
+z_index = 1
+_sections_unfolded = [ "Z Index" ]
+
+[node name="StartButton" type="Button" parent="Control" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 12.0
+margin_bottom = 20.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+focus_mode = 2
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
+toggle_mode = false
+enabled_focus_mode = 2
+shortcut = null
+group = null
+text = "Start Simulation"
+flat = false
+align = 1
 script = ExtResource( 3 )
+
+[connection signal="pressed" from="Control/StartButton" to="Control/StartButton" method="OnButtonPressed"]
 
 
