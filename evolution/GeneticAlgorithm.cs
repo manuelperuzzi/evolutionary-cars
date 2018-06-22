@@ -112,7 +112,7 @@ public class GeneticAlgorithm
 
         for (int i = 0; i < weightCount; i++)
         {
-            if (randomizer.Next() < DefaultCrossSwapProbability) // swap weights
+            if (randomizer.NextDouble() < DefaultCrossSwapProbability) // swap weights
             {
                 offWeights1[i] = parent2[i];
                 offWeights2[i] = parent1[i];
@@ -137,7 +137,7 @@ public class GeneticAlgorithm
     private static void MutateGenotype(Genotype genotype)
     {
         for (int i = 0; i < genotype.WeightCount; i++)
-            if (randomizer.Next() < DefaultMutationProbability)
+            if (randomizer.NextDouble() < DefaultMutationProbability)
             {
                 genotype[i] += (randomizer.NextDouble() * (DefaultMutationAmount * 2)) - DefaultMutationAmount;
             }
@@ -166,7 +166,6 @@ public class GeneticAlgorithm
         List<Genotype> intermediatePopulation = this.Selection();
         List<Genotype> newPopulation = this.Recombination(intermediatePopulation, this.PopulationSize, DefaultSurvivalGenotype);
         this.MutateAll(newPopulation);
-
         this._currentPopulation = newPopulation;
         GenerationCount++;
         this.evolutionInProgress = false;
@@ -261,7 +260,7 @@ public class GeneticAlgorithm
     private void MutateAll(List<Genotype> population)
     {
         foreach (Genotype g in population)
-            if (randomizer.Next() < DefaultMutationPercentage)
+            if (randomizer.NextDouble() < DefaultMutationPercentage)
                 GeneticAlgorithm.MutateGenotype(g);
     }
     #endregion

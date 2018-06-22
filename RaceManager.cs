@@ -20,6 +20,8 @@ public class RaceManager : Node
     private Dictionary<int, Checkpoint> checkpoints = new Dictionary<int, Checkpoint>();
     private int aliveCars = 0;
     private int timeElapsed = 0;
+
+    private int furthestCheckpointReached = 0;
     
     private RaceManager() { }
 
@@ -47,6 +49,7 @@ public class RaceManager : Node
             car.Restart(checkpoints[0].GlobalPosition.x, checkpoints[0].GlobalPosition.y);
             timeElapsed = System.Environment.TickCount;
         }
+        this.furthestCheckpointReached = 0;
     }
 
     public override void _Ready()
@@ -93,14 +96,24 @@ public class RaceManager : Node
 
     private void UpdateCarEvaluation(SensorCar car)
     {
-        if(raceCars[car] < checkpoints.Count)
+        if(raceCars[car] < checkpoints.Count - 1)
         {
             Checkpoint currentCheckpoint = checkpoints[raceCars[car]];
             Checkpoint checkpointToReach = checkpoints[raceCars[car] + 1];
             double distanceToCheckpoint = car.GlobalPosition.DistanceTo(checkpointToReach.GlobalPosition);
             if (distanceToCheckpoint < distanceThreshold)
+            {   
                 raceCars[car] = raceCars[car] + 1;
-
+                currentCheckpoint = checkpoints[raceCars[car]];
+                checkpointToReach = checkpoints[raceCars[car] + 1];
+                distanceToCheckpoint = car.GlobalPosition.DistanceTo(checkpointToReach.GlobalPosition);
+                if (raceCars[car] > furthestCheckpointReached)
+                {
+                    this.furthestCheckpointReached = raceCars[car];
+                    this.timeElapsed = System.Environment.TickCount;
+                }
+                
+            }
             double distanceBetweenCheckpoints = currentCheckpoint.GlobalPosition.DistanceTo(checkpointToReach.GlobalPosition);
             double currentScore = checkpoints[raceCars[car]].Score + (distanceBetweenCheckpoints - distanceToCheckpoint);
 

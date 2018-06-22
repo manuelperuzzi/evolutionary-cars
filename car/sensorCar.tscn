@@ -29,7 +29,7 @@ _sections_unfolded = [ "Transform" ]
 position = Vector2( 67, 0 )
 enabled = true
 exclude_parent = true
-cast_to = Vector2( 150, 0 )
+cast_to = Vector2( 250, 0 )
 collision_mask = 1
 _sections_unfolded = [ "Transform" ]
 
@@ -39,7 +39,7 @@ position = Vector2( 67, 0 )
 rotation = -0.523599
 enabled = true
 exclude_parent = true
-cast_to = Vector2( 150, 0 )
+cast_to = Vector2( 250, 0 )
 collision_mask = 1
 _sections_unfolded = [ "Transform" ]
 
@@ -49,7 +49,7 @@ position = Vector2( 67, 0 )
 rotation = -1.0472
 enabled = true
 exclude_parent = true
-cast_to = Vector2( 150, 0 )
+cast_to = Vector2( 250, 0 )
 collision_mask = 1
 _sections_unfolded = [ "Transform" ]
 
@@ -59,7 +59,7 @@ position = Vector2( 67, 0 )
 rotation = 0.523599
 enabled = true
 exclude_parent = true
-cast_to = Vector2( 150, 0 )
+cast_to = Vector2( 250, 0 )
 collision_mask = 1
 _sections_unfolded = [ "Transform" ]
 
@@ -69,7 +69,7 @@ position = Vector2( 67, 0 )
 rotation = 1.0472
 enabled = true
 exclude_parent = true
-cast_to = Vector2( 150, 0 )
+cast_to = Vector2( 250, 0 )
 collision_mask = 1
 _sections_unfolded = [ "Transform" ]
 
