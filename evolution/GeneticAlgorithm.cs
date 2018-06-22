@@ -166,13 +166,7 @@ public class GeneticAlgorithm
         List<Genotype> intermediatePopulation = this.Selection();
         List<Genotype> newPopulation = this.Recombination(intermediatePopulation, this.PopulationSize, DefaultSurvivalGenotype);
         this.MutateAll(newPopulation);
-
         this._currentPopulation = newPopulation;
-        Console.WriteLine("****");
-        foreach (Genotype g in _currentPopulation) 
-        {
-            Console.WriteLine(g.GetWeightCopy());
-        }
         GenerationCount++;
         this.evolutionInProgress = false;
     } 
