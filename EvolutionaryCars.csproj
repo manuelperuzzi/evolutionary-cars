@@ -59,7 +59,8 @@
     <Compile Include="evolution\GeneticAlgorithm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RaceManager.cs" />
-    <Compile Include="tracks\track01\Checkpoint.cs" />
+    <Compile Include="StartButton.cs" />
+    <Compile Include="tracks\Checkpoint.cs" />
     <Compile Include="Controller.cs" />
   </ItemGroup>
   <ItemGroup />
