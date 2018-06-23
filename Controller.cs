@@ -49,7 +49,7 @@ public class Controller
             else 
                 this.firstGeneration = false;
             RaceManager.Instance.SetupCars(this.CreateAgents(this.geneticAlgorithm.CurrentPopulation));
-            RaceManager.Instance.Restart();
+            RaceManager.Instance.Restart(geneticAlgorithm.GenerationCount);
         }
         else 
         {

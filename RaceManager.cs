@@ -12,18 +12,39 @@ public class RaceManager : Node
 
     private static RaceManager _instance;
     private static readonly String mainPath = "/root/Main";
-    private static readonly String trackPath = mainPath + "/Track01";
-    private static readonly int timeThreshold = 10000;
-    private static readonly double distanceThreshold = 20;
+    private static readonly String labelPath = "Control/GenerationLabel";
+    private static readonly int timeThreshold = 5000;
 
+    private RichTextLabel generationLabel;
     private Dictionary<SensorCar, int> raceCars = new Dictionary<SensorCar, int>();
     private Dictionary<int, Checkpoint> checkpoints = new Dictionary<int, Checkpoint>();
+    private Dictionary<SensorCar, int> lastCheckpointTimestamp = new Dictionary<SensorCar, int>();
     private int aliveCars = 0;
-    private int timeElapsed = 0;
+    private double distanceThreshold = 0;
 
-    private int furthestCheckpointReached = 0;
-    
-    private RaceManager() { }
+    public override void _Ready()
+    {
+        _instance = this;
+        
+        var mainNode = (Main) GetNode(mainPath);
+        distanceThreshold = mainNode.distanceThreshold;
+        generationLabel = (RichTextLabel)mainNode.GetNode(labelPath);
+        this.LoadTrack(mainNode, mainNode.trackScenePath);
+        this.LoadCars(mainNode, mainNode.carScenePath, mainNode.carsNumber);
+    }
+
+    public override void _PhysicsProcess(float delta)
+    {
+        if (aliveCars > 0)
+            foreach (SensorCar car in raceCars.Keys.ToList())
+                if (car.IsAlive)
+                {
+                    if (System.Environment.TickCount - lastCheckpointTimestamp[car] > timeThreshold)
+                        car.Kill();
+                    else
+                        UpdateCarEvaluation(car);
+                }
+    }
 
     public static RaceManager Instance
     {
@@ -40,82 +61,76 @@ public class RaceManager : Node
             car.Agent = agents[count++];
     }
 
-    public void Restart()
+    public void Restart(int generationNumber)
     {
+        generationLabel.Text = "Generation " + generationNumber;
         aliveCars = raceCars.Count;
         foreach (SensorCar car in raceCars.Keys.ToList())
         {
             raceCars[car] = 0;
             car.Restart(checkpoints[0].GlobalPosition.x, checkpoints[0].GlobalPosition.y);
-            timeElapsed = System.Environment.TickCount;
+            lastCheckpointTimestamp[car] = System.Environment.TickCount;
         }
-        this.furthestCheckpointReached = 0;
     }
 
-    public override void _Ready()
+    private void LoadTrack(Node parent, string trackScenePath) 
     {
-        _instance = this;
-        
-        var mainNode = (Main) GetNode(mainPath);
-        for (int i = 0; i < mainNode.carsNumber; i++) {
-            var carScene = (PackedScene) ResourceLoader.Load("res://car/sensorCar.tscn");
-            SensorCar sensorCar = (SensorCar) carScene.Instance();
-            raceCars.Add(sensorCar, 0);
-            CallDeferred("AddCar", mainNode, sensorCar);
-        }
-        
-        var tmp = GetNode(trackPath).GetChildren();
-        for (int i = 0; i < tmp.Length; i++)
-            checkpoints.Add(i, (Checkpoint)tmp[i]);
+        var trackScene = (PackedScene) ResourceLoader.Load(trackScenePath);
+        TileMap track = (TileMap) trackScene.Instance();
+
+        CallDeferred("AddTrack", parent, track);
+
+        var checkpointNodes = track.GetChildren();
+        for (int i = 0; i < checkpointNodes.Length; i++) 
+            checkpoints.Add(i, (Checkpoint)checkpointNodes[i]);
         SetCheckpointScores();
     }
 
-    public override void _PhysicsProcess(float delta)
+    private void AddTrack(Node parent, TileMap track) 
     {
-        if (aliveCars > 0)
-        {
-            if (System.Environment.TickCount - timeElapsed > timeThreshold)
-            {
-                foreach (SensorCar car in raceCars.Keys.ToList())
-                    if (car.IsAlive)
-                        car.Kill();
-            }
-            else
-            {
-                foreach (SensorCar car in raceCars.Keys.ToList())
-                    if (car.IsAlive)
-                        UpdateCarEvaluation(car);
-            }       
-            
+        parent.AddChild(track);
+    }
+
+    private void LoadCars(Node parent, string carScenePath, int carsNumber) 
+    {
+        for (int i = 0; i < carsNumber; i++) {
+            var carScene = (PackedScene) ResourceLoader.Load(carScenePath);
+            SensorCar car = (SensorCar) carScene.Instance();
+            raceCars.Add(car, 0);
+            lastCheckpointTimestamp.Add(car, 0);
+            CallDeferred("AddCar", parent, car);
         }
     }
 
-    private void AddCar(Node parent, SensorCar car) {
+    private void AddCar(Node parent, SensorCar car) 
+    {
         parent.AddChild(car);
+        car.GlobalPosition = checkpoints[0].GlobalPosition;
     }
 
     private void UpdateCarEvaluation(SensorCar car)
     {
         if(raceCars[car] < checkpoints.Count - 1)
         {
-            Checkpoint currentCheckpoint = checkpoints[raceCars[car]];
             Checkpoint checkpointToReach = checkpoints[raceCars[car] + 1];
             double distanceToCheckpoint = car.GlobalPosition.DistanceTo(checkpointToReach.GlobalPosition);
             if (distanceToCheckpoint < distanceThreshold)
             {   
                 raceCars[car] = raceCars[car] + 1;
-                currentCheckpoint = checkpoints[raceCars[car]];
-                checkpointToReach = checkpoints[raceCars[car] + 1];
-                distanceToCheckpoint = car.GlobalPosition.DistanceTo(checkpointToReach.GlobalPosition);
-                if (raceCars[car] > furthestCheckpointReached)
-                {
-                    this.furthestCheckpointReached = raceCars[car];
-                    this.timeElapsed = System.Environment.TickCount;
-                }
-                
+                lastCheckpointTimestamp[car] = System.Environment.TickCount;           
             }
-            double distanceBetweenCheckpoints = currentCheckpoint.GlobalPosition.DistanceTo(checkpointToReach.GlobalPosition);
-            double currentScore = checkpoints[raceCars[car]].Score + (distanceBetweenCheckpoints - distanceToCheckpoint);
+
+            double currentScore;
+            if (raceCars[car] == checkpoints.Count - 1)
+                currentScore = checkpoints[raceCars[car]].Score;
+            else
+            {
+                Checkpoint currentCheckpoint = checkpoints[raceCars[car]];
+                checkpointToReach = checkpoints[raceCars[car] + 1];
+                double distanceBetweenCheckpoints = currentCheckpoint.GlobalPosition.DistanceTo(checkpointToReach.GlobalPosition);
+                distanceToCheckpoint = car.GlobalPosition.DistanceTo(checkpointToReach.GlobalPosition);
+                currentScore = checkpoints[raceCars[car]].Score + (distanceBetweenCheckpoints - distanceToCheckpoint);
+            }
 
             car.Agent.Genotype.Evaluation = Math.Max(0, currentScore);
         }
