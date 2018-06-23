@@ -32,7 +32,7 @@ __meta__ = {
 
 position = Vector2( 1400, 430 )
 script = ExtResource( 2 )
-_sections_unfolded = [ "Transform" ]
+_sections_unfolded = [ "Transform", "Visibility" ]
 
 [node name="checkpoint1" type="Node2D" parent="." index="1"]
 

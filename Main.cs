@@ -11,4 +11,7 @@ public class Main : Node2D
 
     [Export]
     public int carsNumber = 20;
+
+    [Export]
+    public double distanceThreshold = 20;
 }
