@@ -35,7 +35,7 @@ public class GeneticAlgorithm
     /// <summary>
     /// Default number of genotypes that pass in the new generation without recombination.
     /// </summary>
-    public const int DefaultSurvivalGenotype = 2;
+    public const int DefaultSurvivalGenotype = 1;
     #endregion
 
     private bool evolutionInProgress;
@@ -165,7 +165,7 @@ public class GeneticAlgorithm
         this._currentPopulation.Sort(); // sort by fitness
         List<Genotype> intermediatePopulation = this.Selection();
         List<Genotype> newPopulation = this.Recombination(intermediatePopulation, this.PopulationSize, DefaultSurvivalGenotype);
-        this.MutateAll(newPopulation);
+        this.MutateAllButBestN(newPopulation, DefaultSurvivalGenotype);
         this._currentPopulation = newPopulation;
         GenerationCount++;
         this.evolutionInProgress = false;
@@ -218,7 +218,7 @@ public class GeneticAlgorithm
     /// between two genotypes is made by <see cref="CompleteCrossover"/>. At the end a new population of 
     /// size newPopulationSize is created. A number of genotypes, given by the parameter survivalGenotype 
     /// are directly passed to the new generation. <br/><br/>
-    /// Note, the intermediatePopulation has to be ordered in descending order by fitness.
+    /// Note, the intermediatePopulation and the current population have to be ordered in descending order by fitness.
     /// </summary>
     /// <param name="intermediatePopulation">The intermediate population</param>
     /// <param name="newPopulationSize">The size of the new population</param>
@@ -231,7 +231,7 @@ public class GeneticAlgorithm
             throw new ArgumentException("The intermediate population has to be at least of size 2");
         List<Genotype> newPopulation = new List<Genotype>();
         for (int i = 0; i < survivalGenotype; i++)
-            newPopulation.Add(intermediatePopulation[i]);
+            newPopulation.Add(this._currentPopulation[i]);
 
         while (newPopulation.Count < newPopulationSize)
         {
@@ -262,6 +262,20 @@ public class GeneticAlgorithm
         foreach (Genotype g in population)
             if (randomizer.NextDouble() < DefaultMutationPercentage)
                 GeneticAlgorithm.MutateGenotype(g);
+    }
+
+        /// <summary>
+    /// Try to mutate all genotypes given, except the first n. A genotype has a probability of 
+    /// <see cref="DefaultMutationPercentage"/> to be mutated. <br/><br/>
+    /// Genotype is mutated accordig to <see cref="MutateGenotype"/>
+    /// </summary>
+    /// <param name="population">The population of genotypes to be mutated</param>
+    /// /// <param name="n">The number of genotypes to leave untouched</param>
+    private void MutateAllButBestN(List<Genotype> population, int n)
+    {
+        for (int i = 0; i < population.Count; i++)
+            if (i >= n && randomizer.NextDouble() < DefaultMutationPercentage)
+                GeneticAlgorithm.MutateGenotype(population[i]);
     }
     #endregion
 }
