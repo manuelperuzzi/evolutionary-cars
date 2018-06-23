@@ -12,6 +12,7 @@ public class RaceManager : Node
 
     private static RaceManager _instance;
     private static readonly String mainPath = "/root/Main";
+    private static readonly String labelPath = "Control/GenerationLabel";
     private static readonly int timeThreshold = 5000;
 
     private RichTextLabel generationLabel;
@@ -27,7 +28,7 @@ public class RaceManager : Node
         
         var mainNode = (Main) GetNode(mainPath);
         distanceThreshold = mainNode.distanceThreshold;
-        generationLabel = (RichTextLabel)mainNode.GetNode("Control").GetNode("GenerationLabel");
+        generationLabel = (RichTextLabel)mainNode.GetNode(labelPath);
         this.LoadTrack(mainNode, mainNode.trackScenePath);
         this.LoadCars(mainNode, mainNode.carScenePath, mainNode.carsNumber);
     }

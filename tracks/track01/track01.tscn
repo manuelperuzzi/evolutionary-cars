@@ -3,7 +3,7 @@
 [ext_resource path="res://tilemap/sidewalk-car.tres" type="TileSet" id=1]
 [ext_resource path="res://tracks/Checkpoint.cs" type="Script" id=2]
 
-[node name="track01" type="TileMap"]
+[node name="track01" type="TileMap" index="0"]
 
 scale = Vector2( 0.2, 0.2 )
 mode = 0
