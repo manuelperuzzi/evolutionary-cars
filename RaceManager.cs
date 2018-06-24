@@ -40,7 +40,10 @@ public class RaceManager : Node
                 if (car.IsAlive)
                 {
                     if (System.Environment.TickCount - lastCheckpointTimestamp[car] > timeThreshold)
+                    {
+                        GD.Print("Car " + car.Name + " timed out");
                         car.Kill();
+                    }
                     else
                         UpdateCarEvaluation(car);
                 }
@@ -117,6 +120,7 @@ public class RaceManager : Node
             if (distanceToCheckpoint < distanceThreshold)
             {   
                 raceCars[car] = raceCars[car] + 1;
+                GD.Print("Car " + car.Name + " reached checkpoint " + raceCars[car]);
                 lastCheckpointTimestamp[car] = System.Environment.TickCount;           
             }
 
