@@ -11,7 +11,7 @@ namespace CarDrivers
 
     public class DriverAgent : IDriverAgent
     {
-        private static readonly uint[] NEURAL_NETWORK_TOPOLOGY = new uint[] {5, 4, 3, 2}; 
+        private static readonly uint[] NEURAL_NETWORK_TOPOLOGY = new uint[] {5, 4, 4, 3, 2}; 
 
         public Genotype Genotype { get; private set; }
         private NeuralNetwork neuralNetwork;
