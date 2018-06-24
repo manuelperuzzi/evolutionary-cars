@@ -36,6 +36,7 @@ public class SensorCar : KinematicBody2D
 
     public void Kill() 
     {
+        this.Stop();
         this._isAlive = false;
         EmitSignal(nameof(CarDeadSignal));
     }
@@ -81,6 +82,11 @@ public class SensorCar : KinematicBody2D
 		this.MoveAndCollide(movementParams * delta);
 	}
 
+    private void Stop()
+    {
+        this.MoveAndCollide(new Vector2());
+    }
+
 	private double GetSensorValue(double angle) 
 	{
 		if (this.sensors[angle].IsColliding()) 
@@ -104,7 +110,7 @@ public class SensorCar : KinematicBody2D
 
 	private Vector2 TransformMovementParams(double engineForce, double direction, float delta) 
 	{
-		this.Rotation += (float) (direction * 2 - 1) * delta; 
+		this.Rotation += (float) (direction * 10 - 5) * delta; 
 		Vector2 velocity = new Vector2((float) engineForce * 100, 0).Rotated(this.Rotation);
 		return velocity;
 	}
