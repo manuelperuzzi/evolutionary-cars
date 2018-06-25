@@ -14,16 +14,16 @@ We used [Godot](https://godotengine.org) and C# for simulating the car races. We
 ### Examples
 Easy circuit
 
-![easy](https://github.com/manuelperuzzi/evolutionary-cars/blob/develop/examples/evo-cars_track02.gif?raw=true)
+![easy](https://github.com/manuelperuzzi/evolutionary-cars/blob/master/examples/evo-cars_track02.gif?raw=true)
 
 Medium-easy circuit
 
-![medium-easy](https://github.com/manuelperuzzi/evolutionary-cars/blob/develop/examples/evo-cars_track03.gif?raw=true)
+![medium-easy](https://github.com/manuelperuzzi/evolutionary-cars/blob/master/examples/evo-cars_track03.gif?raw=true)
 
 Medium-hard circuit
 
-![medium-hard](https://github.com/manuelperuzzi/evolutionary-cars/blob/develop/examples/evo-cars_track01.gif?raw=true)
+![medium-hard](https://github.com/manuelperuzzi/evolutionary-cars/blob/master/examples/evo-cars_track01.gif?raw=true)
 
 Hard circuit
 
-![hard](https://github.com/manuelperuzzi/evolutionary-cars/blob/develop/examples/evo-cars_track04.gif?raw=true)
+![hard](https://github.com/manuelperuzzi/evolutionary-cars/blob/master/examples/evo-cars_track04.gif?raw=true)
