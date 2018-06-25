@@ -1,0 +1,76 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://car/SensorCar.cs" type="Script" id=1]
+[ext_resource path="res://tilemap/car/car.svg" type="Texture" id=2]
+
+[node name="SensorCar" type="KinematicBody2D"]
+
+position = Vector2( 40, 60 )
+scale = Vector2( 0.3, 0.35 )
+input_pickable = false
+collision_layer = 1
+collision_mask = 1
+collision/safe_margin = 0.08
+script = ExtResource( 1 )
+_sections_unfolded = [ "Transform" ]
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="." index="0"]
+
+rotation = 3.14159
+scale = Vector2( 0.2, 0.2 )
+texture = ExtResource( 2 )
+_sections_unfolded = [ "Transform" ]
+
+[node name="ray0" type="RayCast2D" parent="." index="1"]
+
+position = Vector2( 67, 0 )
+enabled = true
+exclude_parent = true
+cast_to = Vector2( 250, 0 )
+collision_mask = 1
+_sections_unfolded = [ "Transform" ]
+
+[node name="ray+30" type="RayCast2D" parent="." index="2"]
+
+position = Vector2( 67, 0 )
+rotation = -0.523599
+enabled = true
+exclude_parent = true
+cast_to = Vector2( 250, 0 )
+collision_mask = 1
+_sections_unfolded = [ "Transform" ]
+
+[node name="ray+60" type="RayCast2D" parent="." index="3"]
+
+position = Vector2( 67, 0 )
+rotation = -1.0472
+enabled = true
+exclude_parent = true
+cast_to = Vector2( 250, 0 )
+collision_mask = 1
+_sections_unfolded = [ "Transform" ]
+
+[node name="ray-30" type="RayCast2D" parent="." index="4"]
+
+position = Vector2( 67, 0 )
+rotation = 0.523599
+enabled = true
+exclude_parent = true
+cast_to = Vector2( 250, 0 )
+collision_mask = 1
+_sections_unfolded = [ "Transform" ]
+
+[node name="ray-60" type="RayCast2D" parent="." index="5"]
+
+position = Vector2( 67, 0 )
+rotation = 1.0472
+enabled = true
+exclude_parent = true
+cast_to = Vector2( 250, 0 )
+collision_mask = 1
+_sections_unfolded = [ "Transform" ]
+
+

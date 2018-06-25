@@ -3,6 +3,11 @@
 .import/
 export.cfg
 export_presets.cfg
+*.import
+default/
+default_env.tres
+icon.png
 
 # Mono-specific ignores
 .mono/
+.vs/
