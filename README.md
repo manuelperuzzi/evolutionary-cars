@@ -26,4 +26,4 @@ Medium-hard circuit
 
 Hard circuit
 
-![easy](https://github.com/manuelperuzzi/evolutionary-cars/blob/develop/examples/evo-cars_track04.gif?raw=true)
+![hard](https://github.com/manuelperuzzi/evolutionary-cars/blob/develop/examples/evo-cars_track04.gif?raw=true)
