@@ -12,10 +12,18 @@ More details will be provided in the project report.
 ### Simulation  
 We used [Godot](https://godotengine.org) and C# for simulating the car races. We created four different circuits with different difficulty levels. If you wish to run the simulation by yourself you will need Godot with C# integration. Be aware that running the simulation on the toughest circuits will need several minutes. There is no way to speed up the simulation yet.
 ### Examples
+Easy circuit
+
+![easy](https://github.com/manuelperuzzi/evolutionary-cars/blob/develop/examples/evo-cars_track02.gif?raw=true)
+
 Medium-easy circuit
 
-![alt-text](https://github.com/manuelperuzzi/evolutionary-cars/blob/develop/examples/evo-cars_track03.gif?raw=true)
+![medium-easy](https://github.com/manuelperuzzi/evolutionary-cars/blob/develop/examples/evo-cars_track03.gif?raw=true)
 
 Medium-hard circuit
 
-![alt-text](https://github.com/manuelperuzzi/evolutionary-cars/blob/develop/examples/evo-cars_track01.gif?raw=true)
+![medium-hard](https://github.com/manuelperuzzi/evolutionary-cars/blob/develop/examples/evo-cars_track01.gif?raw=true)
+
+Hard circuit
+
+![easy](https://github.com/manuelperuzzi/evolutionary-cars/blob/develop/examples/evo-cars_track04.gif?raw=true)
