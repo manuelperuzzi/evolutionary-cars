@@ -49,19 +49,19 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="car\SensorCar.cs" />
-    <Compile Include="Main.cs" />
-    <Compile Include="nn\ActivationFunctions.cs" />
-    <Compile Include="nn\NeuralLayer.cs" />
-    <Compile Include="nn\NeuralNetwork.cs" />
-    <Compile Include="driver\DriverAgent.cs" />
-    <Compile Include="evolution\Genotype.cs" />
-    <Compile Include="evolution\GeneticAlgorithm.cs" />
+    <Compile Include="godot\cars\SensorCar.cs" />
+    <Compile Include="godot\control\RaceManager.cs" />
+    <Compile Include="godot\control\StartButton.cs" />
+    <Compile Include="godot\environment\tracks\Checkpoint.cs" />
+    <Compile Include="godot\Main.cs" />
+    <Compile Include="core\neural-network\ActivationFunctions.cs" />
+    <Compile Include="core\neural-network\NeuralLayer.cs" />
+    <Compile Include="core\neural-network\NeuralNetwork.cs" />
+    <Compile Include="core\driver-agent\DriverAgent.cs" />
+    <Compile Include="core\evolution\Genotype.cs" />
+    <Compile Include="core\evolution\GeneticAlgorithm.cs" />
+    <Compile Include="core\Controller.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RaceManager.cs" />
-    <Compile Include="StartButton.cs" />
-    <Compile Include="tracks\Checkpoint.cs" />
-    <Compile Include="Controller.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

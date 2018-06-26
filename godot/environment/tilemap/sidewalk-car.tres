@@ -1,7 +1,9 @@
 [gd_resource type="TileSet" load_steps=4 format=2]
 
-[ext_resource path="res://tilemap/sidewalk/street_tiles.png" type="Texture" id=1]
-[ext_resource path="res://tilemap/car/car.svg" type="Texture" id=2]
+[ext_resource path="res://godot/environment/tilemap/sidewalk/street_tiles.png" type="Texture" id=1]
+[ext_resource path="res://godot/environment/tilemap/car/car.svg" type="Texture" id=2]
+
+
 
 [sub_resource type="RectangleShape2D" id=1]
 

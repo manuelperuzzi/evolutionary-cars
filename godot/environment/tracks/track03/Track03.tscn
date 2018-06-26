@@ -1,7 +1,10 @@
 [gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://tilemap/sidewalk-car.tres" type="TileSet" id=1]
-[ext_resource path="res://tracks/Checkpoint.cs" type="Script" id=2]
+[ext_resource path="res://godot/environment/tilemap/sidewalk-car.tres" type="TileSet" id=1]
+[ext_resource path="res://godot/environment/tracks/Checkpoint.cs" type="Script" id=2]
+
+
+
 
 [node name="Track03" type="TileMap"]
 

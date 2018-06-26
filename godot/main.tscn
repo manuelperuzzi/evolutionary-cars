@@ -1,14 +1,14 @@
 [gd_scene load_steps=4 format=2]
 
-[ext_resource path="res://Main.cs" type="Script" id=1]
-[ext_resource path="res://RaceManager.cs" type="Script" id=2]
-[ext_resource path="res://StartButton.cs" type="Script" id=3]
+[ext_resource path="res://godot/Main.cs" type="Script" id=1]
+[ext_resource path="res://godot/control/RaceManager.cs" type="Script" id=2]
+[ext_resource path="res://godot/control/StartButton.cs" type="Script" id=3]
 
 [node name="Main" type="Node2D" index="0"]
 
 script = ExtResource( 1 )
-carScenePath = "res://car/sensorCar.tscn"
-trackScenePath = "res://tracks/track01/track01.tscn"
+carScenePath = "res://godot/cars/sensorCar.tscn"
+trackScenePath = "res://godot/environment/tracks/track01/track01.tscn"
 carsNumber = 50
 distanceThreshold = 50.0
 
