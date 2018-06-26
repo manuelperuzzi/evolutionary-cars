@@ -1,5 +1,5 @@
 # Evolutionary cars
-This is the repository for the project of the course _sistemi intelligenti robotici (intelligent robot systems)_, University of Bologna, A.Y. 2017/2018.
+This is the repository for the project of the course _sistemi intelligenti robotici (intelligent robotic systems)_, University of Bologna, A.Y. 2017/2018.
 ## Goal of the projects
 The project aims to design and implement a system in which 2D cars learn to drive on a circuit through an evolutionary robotics approach based on neural networks.
 ### General description
