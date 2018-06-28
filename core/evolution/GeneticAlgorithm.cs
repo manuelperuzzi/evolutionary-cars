@@ -162,6 +162,7 @@ public class GeneticAlgorithm
     {
         this.evolutionInProgress = true;
         this.FitnessCalculation();
+        FileWriter.WriteGenotypes(GenerationCount, new List<Genotype>(this._currentPopulation));
         this._currentPopulation.Sort(); // sort by fitness
         List<Genotype> intermediatePopulation = this.Selection();
         List<Genotype> newPopulation = this.Recombination(intermediatePopulation, this.PopulationSize, DefaultSurvivalGenotype);

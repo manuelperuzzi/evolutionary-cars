@@ -31,6 +31,7 @@ public class RaceManager : Node
         generationLabel = (RichTextLabel)mainNode.GetNode(labelPath);
         this.LoadTrack(mainNode, mainNode.trackScenePath);
         this.LoadCars(mainNode, mainNode.carScenePath, mainNode.carsNumber);
+        FileWriter.Init(mainNode.trackScenePath);
     }
 
     public override void _PhysicsProcess(float delta)
