@@ -9,8 +9,8 @@ public class Controller
 {
     private static readonly Controller _instance = new Controller();
 
-    private static readonly int max_iter = 500;
-    private static readonly int genotypeDimension = 67;//100;
+    private static readonly int max_iter = 51;
+    private static readonly int genotypeDimension = 67;
 
     private GeneticAlgorithm geneticAlgorithm;
     private bool firstGeneration;
