@@ -8,7 +8,7 @@
 
 script = ExtResource( 1 )
 carScenePath = "res://godot/cars/sensorCar.tscn"
-trackScenePath = "res://godot/environment/tracks/track01/track01.tscn"
+trackScenePath = "res://godot/environment/tracks/track03/track03.tscn"
 carsNumber = 50
 distanceThreshold = 50.0
 
