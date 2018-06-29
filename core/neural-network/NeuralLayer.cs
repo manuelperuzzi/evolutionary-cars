@@ -50,15 +50,6 @@ namespace NeuralNetworks
                     Weights[i, j] = weights[k++];
         }
 
-        public void SetRandomWeights(double minValue, double maxValue)
-        {
-            double interval = Math.Abs(maxValue - minValue);
-            Random generator = new Random();
-            for (int i = 0; i < Weights.GetLength(0); i++)
-                for (int j = 0; j < Weights.GetLength(1); j++)
-                    Weights[i, j] = minValue + (generator.NextDouble() * interval);
-        }
-
         public double[] ProcessInputs(double[] inputs)
         {
             if (inputs.Length != NeuronCount)

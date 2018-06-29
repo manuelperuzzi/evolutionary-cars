@@ -45,12 +45,6 @@ namespace NeuralNetworks
             }
         }
 
-        public void SetRandomWeights(double minValue, double maxValue)
-        {
-            for (int i = 0; i < Layers.Length; i++)
-                Layers[i].SetRandomWeights(minValue, maxValue);
-        }
-
         public double[] ProcessInputs(double[] inputs)
         {
             if (inputs.Length != Layers[0].NeuronCount)
