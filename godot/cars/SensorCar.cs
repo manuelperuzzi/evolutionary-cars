@@ -3,6 +3,10 @@ using System;
 using System.Collections.Generic;
 using CarDrivers;
 
+/// <summary>
+/// Represents a car equipped with five proximity sensors in the Godot engine. 
+/// It's driven by an <c>IDriverAgent</c>.
+/// </summary>
 public class SensorCar : KinematicBody2D
 {
     [Signal]
@@ -12,18 +16,18 @@ public class SensorCar : KinematicBody2D
 
 	private Dictionary<double, RayCast2D> sensors = new Dictionary<double, RayCast2D>();
 	private Dictionary<double, double> sensorsValues = new Dictionary<double, double>(); 
-
 	private volatile bool _isAlive = false;
+
+	/// <value>True if the car is running, false otherwise.</value>
 	public bool IsAlive { get { return _isAlive; } }
+	
+	/// <value>The agent assigned to this car.</value>
 	public IDriverAgent Agent { get; set; }
 	
-	public void Restart(float xInitialPosition, float yInitialPosition) 
-	{
-		this.GlobalPosition = new Vector2(xInitialPosition, yInitialPosition);
-		this.Rotation = 0;
-		this._isAlive = true;
-	}
-
+	/// <summary>
+	/// See <see cref="Node._Ready" />.
+	/// Collect the sensors needed by this car.
+	/// </summary>
     public override void _Ready()
     {
         this.sensors.Add(0, (RayCast2D) GetNode("ray0"));
@@ -34,6 +38,21 @@ public class SensorCar : KinematicBody2D
         this.Connect("CarDeadSignal", RaceManager.Instance, "OnCarDeath");
     }
 
+	/// <summary>
+	/// Puts the car in the initial position and start a new run.
+	/// </summary>
+	/// <param name="xInitialPosition">The x coordinate of the car initial position.</param>
+	/// <param name="yInitialPosition">The y coordinate of the car initial position.</param>
+	public void Restart(float xInitialPosition, float yInitialPosition) 
+	{
+		this.GlobalPosition = new Vector2(xInitialPosition, yInitialPosition);
+		this.Rotation = 0;
+		this._isAlive = true;
+	}
+
+	/// <summary>
+	/// Stops the car.
+	/// </summary>
     public void Kill() 
     {
         this.Stop();
@@ -41,6 +60,12 @@ public class SensorCar : KinematicBody2D
         EmitSignal(nameof(CarDeadSignal));
     }
 
+	/// <summary>
+	/// See <see cref="Node._PhysicsProcess(float)"/>.
+	/// Implementation of the Sense-Plan-Act metodology: gets the sensor values, sends them to the agent,
+	/// receives engine force and direction from the agent and moves accordingly.
+	/// If the sensors detects a collision the run is over.
+	/// </summary>
 	public override void _PhysicsProcess(float delta)
     {
 		if (this._isAlive) 

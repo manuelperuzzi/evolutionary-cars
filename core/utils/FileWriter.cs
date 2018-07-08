@@ -2,14 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
+/// <summary>
+/// Utility class that writes to file the info of the current simulation.
+/// </summary>
 class FileWriter {
-
     private static readonly string DIRECTORY_PATH = @"results/";
-
     private static string filePath = DIRECTORY_PATH + "default";
 
     private FileWriter() {}
 
+    /// <summary>
+    /// Initialize the new file.
+    /// Makes sure that no previous file will be overwritten in the process.
+    /// </summary>
+    /// <param name="trackPath">The path of the simulation track.</param>
     public static void Init(String trackPath) 
     {
         string[] substrings = trackPath.Split('/');
@@ -22,6 +28,11 @@ class FileWriter {
         filePath = baseFilePath + simCount;
     }
 
+    /// <summary>
+    /// Writes to file a bunch of info related to the evaluated genotypes of the current generation.
+    /// </summary>
+    /// <param name="generation">The current generation number.</param>
+    /// <param name="genotypes">The evaluated genotypes of the current generation.</param>
     public static void WriteGenotypes(int generation, List<Genotype> genotypes) 
     {
         Genotype bestGenotype = genotypes[0];
