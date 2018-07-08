@@ -36,9 +36,7 @@
 \posttitle{\end{center}}
 
 
-\title{\Huge \textbf{Evolutionary Cars} \\
-	\vspace{10pt}
-	\vspace{20pt}
+\title{\vspace{-5em}\Huge \textbf{Evolutionary Cars}
 }
 \author{
 	Gabriele Graffieti \\ \small \url{gabriele.graffieti@studio.unibo.it}
@@ -56,7 +54,6 @@
 
 \maketitle
 \pagenumbering{arabic}
-\newpage
 \tableofcontents
 \newpage
 
@@ -84,11 +81,63 @@ In \autoref{architecture-diagram} è illustrato un diagramma che descrive, in ma
 \end{figure}
 
 \section{Evoluzione} \label{evolution}
-% bisogna spiegare perchè l'evaluation è fatta da un componente della simulazione e non da uno del core
-% oltre all'evaluation, bisogna spiegare anche il timeout
+In questa sezione verrà illustrata più nel dettaglio la parte inerente all'evoluzione del sistema, e al conseguente algoritmo genetico utilizzato. Molte scelte fatte si basano sul progetto \emph{Applying Evolutionary Artificial Neural Networks} \cite{arztRepo}, che è stato preso come punto di riferimento e come base per il nostro progetto. Come detto in precedenza la fase di evoluzione si divide in tre sottofasi distinte: \emph{selezione}, \emph{incrocio} (o \emph{crossover}) e \emph{mutazione}. Prima di procedere all'illustrazione di tali fasi, però, è necessario introdurre i parametri da noi utilizzati per valutare la bontà di un genotipo, e di conseguenza la sua fitness.
+\subsection{Evaluation e Fitness}
+L'\emph{evaluation} rappresenta la bontà di un genotipo, ovvero, nel nostro caso, quanto bene la macchina è riuscita ad evitare i muri. Esso viene calcolato sulla base della distanza percorsa dalla macchina, prendendo come origine il punto da cui essa parte, all'inizio della fase di valutazione. Più una macchina farà strada prima di collidere contro un muro, maggiore sarà l'\emph{evaluation} del suo genoma. 
+
+La fitness può essere calcolata in molti modi diversi, o addirittura fatta coincidere con l'\emph{evaluation}. L'approccio da noi scelto consiste nel calcolare la fitness come rapporto tra l'\emph{evaluation} di un individuo e l'\emph{evaluation} media della generazione. 
+\begin{equation}
+	fitness_i = \frac{evaluation_i}{\overline{ev}}, \hspace{2em} \overline{ev} = \frac{\sum_{j = 0}^{n} evaluation_j }{n}
+\end{equation}
+In questo modo la fitness di un individuo sarà maggiore di uno se superiore alla media di tale generazione, e inferiore nel caso contrario. Ciò sarà utile per il metodo di selezione illustrato di seguito.
+\subsection{Selezione}
+La fase di selezione, prendendo spunto da \cite{arztRepo}, avviene creando una generazione intermedia di potenziali ``\emph{genitori}'', che poi, riproducendosi tra loro, daranno vita ad una nuova generazione. Il metodo utilizzato per la creazione della generazione intermedia si basa sull'\emph{elitismo} in modo che solamente gli individui migliori possano generare la nuova popolazione. In aggiunta a ciò, per mantenere la differenziazione genetica più elevata, vengono aggiunti alcuni genotipi di individui scelti in modo casuale.  
+
+Per prima cosa vengono aggiunti alla generazione intermedia tutti i genotipi degli individui con fitness maggiore di uno (superiore alla media), in modo proporzionale al loro valore di fitness. Ciò significa che il genotipo di un individuo sarà inserito nella generazione intermedia tante volte quanto è il suo valore di fitness troncato all'intero. Ad esempio, se un individuo ha fitness 3.247, il suo genotipo sarà inserito nella generazione intermedia $\lfloor3.247\rfloor = 3$ volte. 
+
+Dopo questa prima selezione per elitismo, ne viene fatta un'altra, in modo casuale. Come detto in precedenza ciò è utile per mantenere i genomi differenziati tra loro, e consente di esplorare strade che il solo elitismo non troverebbe. Il metodo utilizzato è il \emph{reminder stochastic sampling}, e i genotipi da inserire nella generazione intermedia sono scelti nel seguente modo. Sia $r$ un numero casuale tra zero e uno, e $f = fitness_i - \lfloor fitness_i \rfloor$, ovvero la parte frazionaria della fitness. Se $r < f$ allora il genotipo viene inserito nella generazione intermedia.
+
+Notare come la popolazione intermedia ottenuta dopo la fare di selezione non ha dimensione fissa. Essa ha l'unico vincolo di contenere almeno due genotipi, in modo che ci sia sempre una coppia per la successiva fase di riproduzione.
+\subsection{Crossover} \label{crossover}
+Una volta ottenuta la popolazione intermedia di potenziali ``\emph{genitori}'' essi devono essere incrociati tra loro, per ottenere la nuova generazione. L'operatore di crossover da noi scelto è l'\emph{uniform crossover}, in cui ogni singolo gene è scelto dai due genitori in modo indipendente dagli altri. 
+
+Per prima cosa vengono selezionati, in modo casuale, i due genitori dalla popolazione intermedia. Ogni coppia così selezionata produce due figli nel modo seguente: 
+\begin{enumerate}
+	\item Siano parent\textsubscript{1} e parent\textsubscript{2} i due genitori e offspring\textsubscript{1} e offspring\textsubscript{2} i due discendenti.
+	\item Sia $p_{cross}$, tra zero ed uno, la probabilità di crossover.
+	\item Per ogni gene all'interno dei genotipi si estrae un numero casuale $r$, tra zero ed uno. Se $r < p_{cross}$ allora avviene il crossover, e offspring\textsubscript{1} eredita il gene da parent\textsubscript{2}, mentre offspring\textsubscript{2} lo eredita da parent\textsubscript{1}. In caso contrario offspring\textsubscript{1} eredita il gene da parent\textsubscript{1}, e offspring\textsubscript{2} lo eredita da parent\textsubscript{2}.
+	\item Una volta fatto ciò per ogni gene nel genotipo, si ineriscono i due figli, uno alla volta, nella nuova generazione, fino a raggiungere la dimensione desiderata. 
+\end{enumerate}
+Durante prove sperimentali abbiamo notato come, spesso, un genoma molto buono vada perso nella generazione successiva, vanificando di conseguenza i progressi fatti fino a quel momento. Per risolvere tale problematica abbiamo leggermente modificato il metodo proposto in precedenza, inserendo nella nuova generazione i genotipi degli $m$ individui con la migliore fitness della generazione precedente.
+\subsection{Mutazione} \label{mutazione}
+Dopo la composizione della nuova generazione i genotipi dei nuovi individui vengono mutati. La mutazione, all'interno di un genotipo, viene eseguita gene per gene, su basi probabilistiche. Di seguito è riportato lo psedocodice dell'algoritmo di mutazione:
+\begin{enumerate}
+	\item Sia $p_{gt}$ la probabilità, tra zero e uno, che un genotipo sia selezionato per la mutazione dei sui geni. Sia $p_{gn}$ la probabilità, tra zero e uno, che un gene sia mutato. Infine sia $mut_{max}$ il massimo livello di mutazione di un gene (un gene può essere mutato di massimo $\pm mut_{max}$)
+	\item Per ogni genotipo nella nuova generazione viene estratto un numero random $r_1$ tra zero ed uno. Se $r_1 < p_{gt}$ allora il genotipo è selezionato per la mutazione, altrimenti non viene mutato.
+	\item Per ogni gene dei genotipi selezionati al passo 2. viene estratto un numero casuale $r_2$ tra zero ed uno. Se $r_2 < p_{gn}$ il gene viene mutato, di una quantità pari a $r_3 \cdot (mut_{max} \cdot 2) - mut_{max}$, dove $r_3$ è un numero casuale tra zero ed uno. 
+\end{enumerate}
+In \autoref{crossover}, per fare in modo di non perdere i progressi fatti dalle generazioni precedenti, i genotipi degli $m$ individui migliori venivano direttamente passati nella generazione successiva. Essi non devono quindi venire mutati. Per tale motivo l'algoritmo per la mutazione proposto in precedenza non viene eseguito per i primi $m$ genotipi nella nuova generazione, che non saranno perciò mutati.
+\subsection{Valori dei parametri}
+In questa sezione verranno esplicitati i valori dei parametri dell'algoritmo genetico precedentemente illustrato. Tali parametri sono stati utilizzati per le prove sperimentali, descritte in \autoref{risultati}. Il valore di tali parametri non è stato sperimentalmente ricavato tramite \emph{fine tuning}, e perciò non necessariamente rappresentano i migliori valori possibili. Per lo più essi sono stati ricavati da quelli utilizzati in \cite{arztRepo}, o tramite alcuni semplici test sperimentali.
+
+\begin{center}
+	\begin{tabular}{| m{2.5cm} | m{6cm} | m{2cm} |}
+		\hline
+		\textbf{Parametro} & \textbf{Commento}& \textbf{Valore} \\ \hline
+		$p_{cross}$ & Probabilità di crossover tra i geni di due genitori (vedi \autoref{crossover})  & $0.6$ \\ \hline
+		$p_{gt}$ & Probabilità che un genotipo sia selezionato per la mutazione* (vedi \autoref{mutazione})  & $1.0$ \\ \hline
+		$p_{gn}$ & Probabilità che un singolo gene sia mutato (vedi \autoref{mutazione})  & $0.3$ \\ \hline
+		$mut_{max}$ & Massimo valore di cui può essere mutato un gene (vedi \autoref{mutazione})  & $\pm 2$ \\ \hline
+		$m$ & Numero dei genotipi migliori che vengono passati direttamente nella generazione successiva (vedi \autoref{crossover})  & $1$ \\ \hline
+	\end{tabular}
+	\begin{tablenotes}
+		*Gli $m$ genotipi migliori della generazione precedente non vengono mai mutati.
+	\end{tablenotes}
+\end{center} 
 
 \section{Simulazione} \label{simulation}
-
+% bisogna spiegare perchè l'evaluation è fatta da un componente della simulazione e non da uno del core
+% oltre all'evaluation, bisogna spiegare anche il timeout
 L'architettura illustrata in \autoref{architecture} mette in evidenza i componenti principali del sistema. Come anticipato, per completare l'architettura si rivela necessaria l'aggiunta di ulteriori componenti, dipendenti dall'ambiente di esecuzione. Nel progetto in esame, si è scelto di simulare l'ambiente di esecuzione attraverso l'utilizzo di un motore grafico. Il blocco \emph{Execution Environment}, presente in \autoref{architecture-diagram}, è stato raffinato nei seguenti componenti.
 \begin{description}
 	\item[Car]: rappresenta un'auto. È equipaggiata con cinque sensori di prossimità in grado di percepire la distanza da eventuali ostacoli o muri. Più nello specifico, ogni sensore è posizionato secondo una certa angolazione rispetto all'asse dell'auto, da \ang{-60} fino a \ang{+60}. In questo modo è possibile effettuare una completa operazione di \emph{sensing} nella zona frontale rispetto al veicolo. Ogni auto è associata ad un \emph{Driver Agent}, al quale deve inoltrare i valori rilevati dai sensori per ottenere indicazioni sullo spostamento da effettuare. Se dai sensori viene rilevata una collisione con i muri del tracciato, l'auto si ferma immediatamente, notificando il \emph{Race Manager}.
@@ -105,8 +154,16 @@ In questa sezione è stata proposta una possibile architettura per la parte del 
 	\caption{Diagramma informale che rappresenta le relazioni tra i componenti che formano l'architettura del sistema. Nella notazione utilizzata, le frecce tratteggiate indicano una notifica dell'avvenimento di un certo evento, a differenza delle frecce continue che si riferiscono a relazioni di dipendenza. Nel diagramma i componenti caratterizzati da un colore più scuro sono quelli relativi alla simulazione, distinguibili dai restanti che costituiscono invece il \emph{core} del sistema.  \label{simulation-diagram}}
 \end{figure}
 
-\section{Risultati}
+\section{Risultati} \label{risultati}
 
 \section{Conclusioni}
+
+\newpage
+\begin{thebibliography}{1}
+	\bibitem{arztRepo}{Samuel Arzt, \emph{Applying Evolutionary Artificial Neural Networks} \\ URL:  \url{https://github.com/ArztSamuel/Applying_EANNs}\\ Ultima visita: 8 Luglio 2018}
+	
+	\bibitem{ref_paper} António Carlos Gomes Rodrigues Marques Simões, {\em Automatic vehicle classification using appearance based features}, 2015.
+	
+\end{thebibliography}
 
 \end{document}
