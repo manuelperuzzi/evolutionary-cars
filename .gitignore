@@ -11,3 +11,10 @@ icon.png
 # Mono-specific ignores
 .mono/
 .vs/
+
+## Core latex/pdflatex auxiliary files:
+report/*
+
+!/report/*.tex
+report/img/
+!/report/img/

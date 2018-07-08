@@ -14,12 +14,12 @@ class FileWriter {
     {
         string[] substrings = trackPath.Split('/');
         string trackName = substrings[substrings.Length - 1].Split('.')[0];
-        
+        string baseFilePath = DIRECTORY_PATH + "/" + trackName + "/" + trackName + "_sim";
+
         int simCount = 1;
-        while (File.Exists(DIRECTORY_PATH + trackName + "_sim" + simCount))
+        while (File.Exists(baseFilePath + simCount))
             simCount++;
-        
-        filePath = DIRECTORY_PATH + trackName + "_sim" + simCount;
+        filePath = baseFilePath + simCount;
     }
 
     public static void WriteGenotypes(int generation, List<Genotype> genotypes) 
