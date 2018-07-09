@@ -139,7 +139,7 @@ public class GeneticAlgorithm
         for (int i = 0; i < genotype.WeightCount; i++)
             if (randomizer.NextDouble() < DefaultMutationProbability)
             {
-                genotype[i] += (randomizer.NextDouble() * (DefaultMutationAmount * 2)) - DefaultMutationAmount;
+                genotype[i] = genotype[i] + (randomizer.NextDouble() * (DefaultMutationAmount * 2) - DefaultMutationAmount);
             }
     }
     #endregion
@@ -215,6 +215,32 @@ public class GeneticAlgorithm
     }
 
     /// <summary>
+    /// Selects genotypes from the current generation and produces a new generation of genotypes without recombinig them. The algorithm is the following: 
+    /// - Select the best 20% of the current population, and copy every genome 4 times, to produce the 80% of the new population.
+    /// - Select the remaining 20% of the new population randomly, from the worst 80% of the current population.
+    /// </summary>
+    /// <returns>The new generation of genotypes, ready to be mutated.</returns>
+    private List<Genotype> SelectionWithoutRecombination() 
+    {
+        List<Genotype> newPopulation = new List<Genotype>();
+        int index20 = (int) (PopulationSize * 0.2);
+
+        for (int i = 0; i < index20; i++) 
+            for (int j = 0; j < 4; j++) // add a genotype 4 times in the new population
+                newPopulation.Add(new Genotype(_currentPopulation[i].GetWeightCopy()));
+
+        int popSize = newPopulation.Count;
+
+        for (int i = 0; i < PopulationSize - popSize; i++) 
+        {
+            int index = randomizer.Next(index20, PopulationSize);
+            newPopulation.Add(new Genotype(_currentPopulation[index].GetWeightCopy()));
+        }
+
+        return newPopulation;
+    }
+
+    /// <summary>
     /// Recombine the genotypes in intermediate population, producing a new population. The recombination
     /// between two genotypes is made by <see cref="CompleteCrossover"/>. At the end a new population of 
     /// size newPopulationSize is created. A number of genotypes, given by the parameter survivalGenotype 
@@ -260,9 +286,9 @@ public class GeneticAlgorithm
     /// <param name="population">The population of genotypes to be mutated</param>
     private void MutateAll(List<Genotype> population)
     {
-        foreach (Genotype g in population)
+        for (int i = 0; i < population.Count; i++)
             if (randomizer.NextDouble() < DefaultMutationPercentage)
-                GeneticAlgorithm.MutateGenotype(g);
+                GeneticAlgorithm.MutateGenotype(population[i]);   
     }
 
         /// <summary>
