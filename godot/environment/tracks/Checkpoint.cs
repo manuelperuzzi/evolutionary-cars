@@ -7,7 +7,8 @@ using Godot;
 /// </summary>
 public class Checkpoint : Node2D
 {
-    /// <value>The score associated to the checkpoint, used in the evaluation phase.</value>
+    /// <value>The score associated to the checkpoint, used in the evaluation phase. By default, the score of each 
+    /// checkpoint is expressed as the score of the previous checkpoint plus the distance between them.</value>
     public double Score
     {
         get;

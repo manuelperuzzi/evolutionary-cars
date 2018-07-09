@@ -1,5 +1,4 @@
 using Godot;
-using System;
 
 /// <summary>
 /// Startup class. It exposes several fields which can be changed as you like from the Godot editor. 

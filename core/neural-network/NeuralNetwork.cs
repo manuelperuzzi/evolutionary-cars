@@ -69,7 +69,7 @@ namespace NeuralNetworks
         /// <summary>
         /// Processes the given input.
         /// </summary>
-        /// <param name="inputs">The inputs to be processed</param>
+        /// <param name="inputs">The inputs to be processed.</param>
         /// <exception cref="System.ArgumentException">Thrown if the number of inputs values does not match
         /// the number of the first layer neurons.</exception>
         /// <returns>The output produced by the neural network.</returns>

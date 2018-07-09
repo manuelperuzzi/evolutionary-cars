@@ -27,7 +27,7 @@ namespace NeuralNetworks
             private set;
         }
 
-        /// <value>The weights among the layer neurons and the next layer neurons, stored in a bidimensional array</value>
+        /// <value>The weights among the layer neurons and the next layer neurons, stored in a bidimensional array.</value>
         public double[,] Weights
         {
             get;
@@ -76,9 +76,9 @@ namespace NeuralNetworks
         /// <summary>
         /// Processes the given input.
         /// </summary>
-        /// <param name="inputs">The inputs to be processed</param>
+        /// <param name="inputs">The inputs to be processed.</param>
         /// <exception cref="System.ArgumentException">Thrown if the number of inputs values does not match
-        /// the number of neurons of the layer</exception>
+        /// the number of neurons of the layer.</exception>
         /// <returns>The output produced by the neural layer.</returns>
         public double[] ProcessInputs(double[] inputs)
         {

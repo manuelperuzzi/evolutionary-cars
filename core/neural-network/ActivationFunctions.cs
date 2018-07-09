@@ -10,7 +10,7 @@ namespace NeuralNetworks
         /// <summary>
         /// Calculates the sigmoid function for a given input.
         /// </summary>
-        /// <param name="value">The input value</param>
+        /// <param name="value">The input value.</param>
         /// <returns>The function value related to the input.</returns>
         public static double SigmoidFunction(double value)
         {
