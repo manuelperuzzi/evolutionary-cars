@@ -19,6 +19,7 @@
 \usepackage[referable]{threeparttablex}
 \usepackage{pifont}
 \usepackage{siunitx}
+\usepackage{subcaption}
 
 \newcommand{\cmark}{\ding{51}}
 \newcommand{\xmark}{\ding{55}}
@@ -82,8 +83,8 @@ In \autoref{architecture-diagram} è illustrato un diagramma che descrive, in ma
 
 \section{Evoluzione} \label{evolution}
 In questa sezione verrà illustrata più nel dettaglio la parte inerente all'evoluzione del sistema, e al conseguente algoritmo genetico utilizzato. Molte scelte fatte si basano sul progetto \emph{Applying Evolutionary Artificial Neural Networks} \cite{arztRepo}, che è stato preso come punto di riferimento e come base per il nostro elaborato. Come accennato in precedenza la fase di evoluzione si divide in tre sottofasi distinte: \emph{selezione}, \emph{incrocio} (o \emph{crossover}) e \emph{mutazione}. Prima di procedere all'illustrazione di tali fasi, però, è necessario introdurre i parametri da noi utilizzati per valutare la bontà di un genotipo, e di conseguenza la sua fitness.
-\subsection{Evaluation e Fitness}
-L'\emph{evaluation} rappresenta la bontà di un genotipo alla fine della fase di valutazione, ovvero, nel nostro caso, quanto bene la macchina è riuscita ad evitare i muri. Esso viene calcolato sulla base della distanza percorsa dalla macchina, prendendo come origine il punto da cui essa parte all'inizio della fase di valutazione. Più una macchina farà strada prima di collidere contro un muro, maggiore sarà l'\emph{evaluation} del suo genoma. 
+\subsection{Evaluation e Fitness} \label{evFitness}
+L'\emph{evaluation} rappresenta la bontà di un genotipo alla fine della fase di valutazione, ovvero, nel nostro caso, quanto bene l'auto è riuscita ad evitare i muri. Esso viene calcolato sulla base della distanza percorsa dall'auto, prendendo come origine il punto da cui essa parte all'inizio della fase di valutazione. Più un'auto farà strada prima di collidere contro un muro, maggiore sarà l'\emph{evaluation} del suo genoma. 
 
 La fitness può essere calcolata in molti modi diversi, o addirittura fatta coincidere con l'\emph{evaluation}. L'approccio da noi scelto consiste nel calcolare la fitness come rapporto tra l'\emph{evaluation} di un individuo e l'\emph{evaluation} media della generazione. 
 \begin{equation}
@@ -110,7 +111,7 @@ Per prima cosa vengono selezionati, in modo casuale, i due genitori dalla popola
 \end{enumerate}
 Durante prove sperimentali abbiamo notato come, spesso, un genoma molto buono vada perso nella generazione successiva, vanificando di conseguenza i progressi fatti fino a quel momento. Per risolvere tale problematica abbiamo leggermente modificato il metodo proposto in precedenza, inserendo nella nuova generazione i genotipi degli $m$ individui con la migliore fitness della generazione precedente.
 \subsection{Mutazione} \label{mutazione}
-Dopo la composizione della nuova generazione i genotipi dei nuovi individui vengono mutati. La mutazione, all'interno di un genotipo, viene eseguita gene per gene, su basi probabilistiche. Di seguito è riportato lo psedocodice dell'algoritmo di mutazione:
+Dopo la composizione della nuova generazione i genotipi dei nuovi individui vengono mutati. La mutazione, all'interno di un genotipo, viene eseguita gene per gene, su basi probabilistiche. Di seguito è riportato lo pseudo-codice dell'algoritmo di mutazione:
 \begin{enumerate}
 	\item Sia $p_{gt}$ la probabilità, tra zero e uno, che un genotipo sia selezionato per la mutazione dei sui geni. Sia $p_{gn}$ la probabilità, tra zero e uno, che un gene sia mutato. Infine sia $mut_{max}$ il massimo livello di mutazione di un gene (un gene può essere mutato di massimo $\pm mut_{max}$).
 	\item Per ogni genotipo nella nuova generazione viene estratto un numero random $r_1$ tra zero ed uno. Se $r_1 < p_{gt}$ allora il genotipo è selezionato per la mutazione, altrimenti non viene mutato.
@@ -141,7 +142,7 @@ In questa sezione verranno esplicitati i valori dei parametri dell'algoritmo gen
 L'architettura illustrata in \autoref{architecture} mette in evidenza i componenti principali del sistema. Come anticipato, per completare l'architettura si rivela necessaria l'aggiunta di ulteriori componenti, dipendenti dall'ambiente di esecuzione. Nel progetto in esame, si è scelto di simulare l'ambiente di esecuzione attraverso l'utilizzo di un motore grafico. Il blocco \emph{Execution Environment}, presente in \autoref{architecture-diagram}, è stato raffinato nei seguenti componenti.
 \begin{description}
 	\item[Car]: rappresenta un'auto. È equipaggiata con cinque sensori di prossimità in grado di percepire la distanza da eventuali ostacoli o muri. Più nello specifico, ogni sensore è posizionato secondo una certa angolazione rispetto all'asse dell'auto, da \ang{-60} fino a \ang{+60}. In questo modo è possibile effettuare una completa operazione di \emph{sensing} nella zona frontale rispetto al veicolo. Ogni auto è associata ad un \emph{Driver Agent}, al quale deve inoltrare i valori rilevati dai sensori per ottenere indicazioni sullo spostamento da effettuare. Se dai sensori viene rilevata una collisione con i muri del tracciato, l'auto si ferma immediatamente, notificando il \emph{Race Manager}.
-	\item[Race Manager]: è il componente dedito all'esecuzione della fase di \emph{evaluation} di ogni generazione dell'algoritmo genetico. Più nel dettaglio, all'avvio ha il compito di creare auto e tracciato, mentre durante l'evaluation è responsabile del controllo dello stato di ogni auto. All'inizio di ogni iterazione, si occupa del riposizionamento di ogni auto all'inizio del tracciato. Al termine dell'iterazione, ovvero quando tutte le macchine hanno segnalato una collisione o hanno terminato il tracciato, provvede ad assegnare una valutazione al genotipo corrispondente ad ogni auto e a notificare il \emph{Controller}.
+	\item[Race Manager]: è il componente dedito all'esecuzione della fase di \emph{evaluation} di ogni generazione dell'algoritmo genetico. Più nel dettaglio, all'avvio ha il compito di creare auto e tracciato, mentre durante l'evaluation è responsabile del controllo dello stato di ogni auto. All'inizio di ogni iterazione, si occupa del riposizionamento di ogni auto all'inizio del tracciato. Al termine dell'iterazione, ovvero quando tutte le auto hanno segnalato una collisione o hanno terminato il tracciato, provvede ad assegnare una valutazione al genotipo corrispondente ad ogni auto e a notificare il \emph{Controller}.
 	\item[Track]: rappresenta il tracciato, circondato da muri, sul quale si muovono le auto. Su di esso sono disposti dei \emph{checkpoint}, utilizzabili per effettuare l'evaluation del genotipo di ogni auto. I checkpoint sono posizionati, in maniera uniforme, per tutta la lunghezza del tracciato. Il raggiungimento dell'ultimo di essi sancisce il completamento del tracciato.
 \end{description}
 I componenti appena descritti sono rappresentati in \autoref{simulation-diagram}, insieme all'architettura generale del sistema. Per quanto riguarda la fase di valutazione dei genotipi, si sono adottate come riferimento le indicazioni presenti in \autoref{evolution}. Siccome nel calcolo dell'\emph{evaluation} l'unica dimensione presa in considerazione è la distanza percorsa dalle auto, si è rivelato necessario aggiungere anche un vincolo temporale ad ogni iterazione. Seguendo questo approccio, è stato assegnato un timeout ad ogni auto, ovvero un tempo massimo per raggiungere il checkpoint successivo. Il timeout viene resettato al raggiungimento di ogni checkpoint e una sua scadenza significa che l'auto in questione non sta effettuando alcun progresso nel tracciato e quindi deve essere fermata. In questo modo, si evita che le auto rimangano in corsa pur stando ferme in un punto, forzandole a progredire nel tracciato. Il controllo relativo ai timeout è gestito dal componente \emph{Race Manager}.
@@ -155,12 +156,82 @@ I componenti appena descritti sono rappresentati in \autoref{simulation-diagram}
 In questa sezione è stata proposta una possibile architettura per la parte del sistema relativa all'ambiente di esecuzione. L'implementazione dei componenti relativi alla parte dell'ambiente di esecuzione non può essere sviluppata in maniera generale, ma contiene, necessariamente, dei riferimenti all'ambiente stesso. In questo progetto l'ambiente di esecuzione è stato simulato tramite l'utilizzo del motore grafico \emph{Godot}\footnote{\url{https://godotengine.org/}}. Nel caso si voglia adottare un differente ambiente di esecuzione, sia reale che simulato, sarà sufficiente variare l'implementazione dei componenti \emph{Car}, \emph{Race Manager} e \emph{Track} in modo da adattarli all'ambiente scelto. Non sarà necessario apportare modifiche al \emph{core}, a patto che vengano preservate le interazioni tra le due parti del sistema, descritte nell'architettura in \autoref{architecture}.
 
 \section{Risultati} \label{risultati}
+In questa sezione verranno analizzati i risultati ottenuti tramite prove sperimentali del sistema. Per gli esperimenti sono stati utilizzati quattro diversi tracciati, con diversi gradi di difficoltà (codificati in \emph{facile}, \emph{medio-facile}, \emph{medio-difficile}, \emph{difficile}). I tracciati sono visibili in \autoref{fig:tracks}. Alcuni esempi di esecuzioni del sistema sono disponibili in \cite{ourRepo}.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.475\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{./img/track01.png}
+		\caption[Network2]%
+		{{\small Circuito 1 - medio-facile}}    
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.475\textwidth}  
+		\centering 
+		\includegraphics[width=\textwidth]{./img/track02.png}
+		\caption[]%
+		{{\small Circuito 2 - facile}}
+	\end{subfigure}
+	\vskip\baselineskip
+	\begin{subfigure}[b]{0.475\textwidth}   
+		\centering 
+		\includegraphics[width=\textwidth]{./img/track03.png}
+		\caption[]%
+		{{\small Circuito 3 - medio-difficile}}
+	\end{subfigure}
+	\quad
+	\begin{subfigure}[b]{0.475\textwidth}   
+		\centering 
+		\includegraphics[width=\textwidth]{./img/track04.png}
+		\caption[]%
+		{{\small Circuito 4 - difficile}}
+	\end{subfigure}
+	\caption[]
+	{\small I tracciati utilizzati nelle simulazioni. Viene visualizzato anche il punto di partenza delle auto.} 
+	\label{fig:tracks}
+\end{figure}
+La durata degli esperimenti è stata impostata a 50 generazioni, in modo che, per ogni tracciato, almeno un'auto raggiunga la fine dello stesso, identificata dall'ultimo checkpoint. Tale valore è stato settato dopo varie prove, ed ha il solo scopo di soddisfare il requisito sopra espresso. Per ogni tracciato sono stati eseguiti cinque test differenti (un singolo test può durare più di 20 minuti, e ci si è limitati a cinque per tracciato per motivi di tempo). In ogni test è stata tenuta traccia dell'\emph{evaluation} media e massima ad ogni generazione. Non è stata utilizzata la fitness poiché, per come è stata calcolata in questo progetto (vedi \autoref{evFitness}), essa esprime solamente di quanto una singola auto è stata migliore (o peggiore) della media della propria generazione, e quindi essa non rappresenta un dato significativo per tutta la generazione. 
+
+I tracciati hanno lunghezze diverse, e quindi le corrispettive \emph{evaluation} sono differenti. Per tale motivo, quando essi vengono confrontati, non si fa riferimento all'\emph{evaluation}, ma alla percentuale di completamento. I grafici dei dati raccolti durante gli esperimenti sono consultabili di seguito.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=130mm]{../results/track01/averageEvaluation.png}
+	\caption{Grafico che mostra l'andamento dell'\emph{evaluation} media durante le 50 generazioni nel tracciato 1 (medio-facile). Tale grafico raggruppa i valori di cinque esperimenti, e per tale motivo i dati sono visualizzati tramite \emph{boxplot}. Si può notare che l'\emph{evaluation} media ha un andamento per lo più crescente al crescere del numero di generazioni, indicando che le auto, mediamente, fanno più strada prima di collidere con i muri del tracciato, al crescere della generazione.}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=130mm]{../results/track02/averageEvaluation.png}
+	\caption{Grafico che mostra l'andamento dell'\emph{evaluation} media durante le 50 generazioni nel tracciato 2 (facile). Come per i grafici precedenti esso raggruppa, tramite \emph{boxplot}, i valori di cinque diversi esperimenti. Anche in questo caso l'andamento dell'\emph{evaluation} media è crescente al crescere delle generazioni, certificando la bontà delle soluzioni adottate. }
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=130mm]{../results/track03/averageEvaluation.png}
+	\caption{Grafico che mostra l'andamento dell'\emph{evaluation} media durante le 50 generazioni nel tracciato 3 (medio-difficile). Come per i grafici precedenti esso raggruppa, tramite \emph{boxplot}, i valori di cinque diversi esperimenti. Anche in questo caso l'andamento dell'\emph{evaluation} media è crescente al crescere delle generazioni, certificando la bontà delle soluzioni adottate. }
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=130mm]{../results/track04/averageEvaluation.png}
+	\caption{Grafico che mostra l'andamento dell'\emph{evaluation} media durante le 50 generazioni nel tracciato 4 (difficile). Come per i grafici precedenti esso raggruppa, tramite \emph{boxplot}, i valori di cinque diversi esperimenti. Anche in questo caso l'andamento dell'\emph{evaluation} media è crescente al crescere delle generazioni, certificando la bontà delle soluzioni adottate. }
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=130mm]{../results/avgEvAtTheEnd.png}
+	\caption{Confronto dei valori di \emph{evaluation} media per i quattro tracciati alla fine dei test (alla 50esima generazione). Come accennato in precedenza, i tracciati hanno lunghezze diverse, e dato che l'\emph{evaluation} è direttamente proporzionale alla distanza percorsa, essi non sono direttamente confrontabili. Per ovviare a questo problema è stata usata la percentuale di completamento del tracciato, ovvero al posto di considerare l'\emph{evaluation} si considera il completamento, dato da \emph{evaluation} dell'auto diviso l'\emph{evaluation} massima per un dato circuito. Quello qui rappresentato è, quindi, il livello medio di completamento del tracciato, alla 50esima generazione. Come si può notare, il tracciato 2 (il più semplice) ha una percentuale media di completamento più alta, mentre gli altri tracciati presentano dati simili. Il tracciato 3 presenta una media di completamento molto bassa, a causa della particolare conformazione ``a strettoia'', che non consente a molte auto di superare le prime asperità. Come per gli altri grafici sono raggruppati i risultati di cinque simulazioni, tramite \emph{boxplot}.}
+\end{figure}
+
 
 \section{Conclusioni}
 
 \newpage
 \begin{thebibliography}{1}
 	\bibitem{arztRepo}{Samuel Arzt, \emph{Applying Evolutionary Artificial Neural Networks} \\ URL:  \url{https://github.com/ArztSamuel/Applying_EANNs}\\ Ultima visita: 8 Luglio 2018}
+	
+	\bibitem{ourRepo}{Gabriele Graffieti, Alfredo Maffi, Manuel Peruzzi \emph{evolutionary-cars} \\ URL:  \url{https://github.com/manuelperuzzi/evolutionary-cars}\\ Ultima visita: 9 Luglio 2018}
 	
 	\bibitem{ref_paper} António Carlos Gomes Rodrigues Marques Simões, {\em Automatic vehicle classification using appearance based features}, 2015.
 	
