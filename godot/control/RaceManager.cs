@@ -5,8 +5,15 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Linq;
 
+/// <summary>
+/// Singleton class representing a race manager, which is meant to handle the genetic algorithm evaluation phase. On startup, its 
+/// task is to load the desired track e create all the cars on it.
+/// </summary>
 public class RaceManager : Node
 {
+    /// <summary>
+    /// Event generated when all the cars crashed/timed out, used to notify the controller.
+    /// </summary>
     public delegate void AllCarsDeadEvent();
     public event AllCarsDeadEvent AllCarsDead;
 
@@ -22,6 +29,10 @@ public class RaceManager : Node
     private int aliveCars = 0;
     private double distanceThreshold = 0;
 
+    /// <summary>
+    /// On startup, its task is to load the desired track and create all the cars on it. Also, it initializes the
+    /// file writer in order to log the execution results.
+    /// </summary>
     public override void _Ready()
     {
         _instance = this;
@@ -34,6 +45,11 @@ public class RaceManager : Node
         FileWriter.Init(mainNode.trackScenePath);
     }
 
+    /// <summary>
+    /// At each tick of the graphic engine, the race manager evaluates the genotype of each (still) alive car. If a fixed
+    /// amount of time has passed since a certain car reached a new checkpoint, then that car is killed, in order
+    /// to foster faster cars.
+    /// </summary>
     public override void _PhysicsProcess(float delta)
     {
         if (aliveCars > 0)
@@ -50,11 +66,18 @@ public class RaceManager : Node
                 }
     }
 
+    /// <value>The race manage singleton.</value>
     public static RaceManager Instance
     {
         get { return _instance; }
     }
 
+    /// <summary>
+    /// Associates a driver agent to each car.
+    /// </summary>
+    /// <param name="agents">The driver agents to be associated.</param>
+    /// <exception cref="System.ArgumentException">Thrown the number of diver agents does not match the number
+    /// of cars.</exception>
     public void SetupCars(IDriverAgent[] agents)
     {
         if (raceCars.Count != agents.Length)
@@ -65,6 +88,10 @@ public class RaceManager : Node
             car.Agent = agents[count++];
     }
 
+    /// <summary>
+    /// Restarts the evaluation phase, setting each car to the track initial position.
+    /// </summary>
+    /// <param name="generationNumber">The generation number, that will be shown on screen.</param>
     public void Restart(int generationNumber)
     {
         generationLabel.Text = "Generation " + generationNumber;
@@ -112,6 +139,11 @@ public class RaceManager : Node
         car.GlobalPosition = checkpoints[0].GlobalPosition;
     }
 
+    /// <summary>
+    /// Updates the evaluation of a given car. More in detail, it checks if the car has reached its next checkpoint, and
+    /// updates the car evaluation accordingly.
+    /// </summary>
+    /// <param name="car">The car to be evaluated.</param>
     private void UpdateCarEvaluation(SensorCar car)
     {
         if(raceCars[car] < checkpoints.Count - 1)
@@ -141,6 +173,9 @@ public class RaceManager : Node
         }
     }
 
+    /// <summary>
+    /// Method called, through Godot's signals, upon a car crash or timeout. 
+    /// </summary>
     [MethodImpl(MethodImplOptions.Synchronized)]
     public void OnCarDeath()
     {
@@ -149,6 +184,10 @@ public class RaceManager : Node
             AllCarsDead?.Invoke();
     }
 
+    /// <summary>
+    /// Sets the checkpoint scores. The score for a given checkpoint is given by the score of the previous checkpoint
+    /// plus the distance between them. The first checkpoint score is equal to 0.
+    /// </summary>
     private void SetCheckpointScores()
     {
         checkpoints[0].Score = 0;
