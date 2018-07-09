@@ -60,9 +60,9 @@
 
 \section{Introduzione}
 
-Questo documento è la relazione del progetto Evolutionary Cars, realizzato per il corso di Sistemi Intelligenti Robotici, erogato dalla facoltà di Ingegneria e Scienze Informatiche dell'Università di Bologna (A.A. 2017/2018).
+Questo documento è la relazione del progetto Evolutionary Cars, realizzato per il corso di Sistemi Intelligenti Robotici, erogato dalla facoltà di Ingegneria e Scienze Informatiche dell'Università di Bologna (A.A. 2017/2018). Lo scopo del progetto è quello di realizzare una simulazione nella quale delle auto (2D) imparino a guidare lungo un circuito, evitandone i muri, attraverso la metodologia \emph{evolutionary robotics}. Più nel dettaglio, l'obiettivo è quello di pilotare ogni auto attraverso una rete neurale separata, ed evolvere i pesi della stessa attraverso un algoritmo genetico, di generazione in generazione.
 
-\section{Stato dell'arte}
+\section{Stato dell'arte} \label{stato-dell-arte}
 
 \section{Architettura} \label{architecture}
 In questa sezione verrà illustrata l'architettura generale del sistema. La progettazione è stata effettuata in modo da isolare gli aspetti chiave da quelli relativi all'ambiente di esecuzione. Di conseguenza, il sistema risulta suddiviso in due sottoparti principali: \emph{core} e ambiente di esecuziuito. D'altro canto, la parte relativa all'ambiente di esecuzione si rivela necessaria per permettere al sistema di adattarsi ed essere eseguito in un certo ambiente, sia esso reale o virtuale. Segue una breve descrizione dei componenti del sistema.
@@ -118,7 +118,7 @@ Dopo la composizione della nuova generazione i genotipi dei nuovi individui veng
 	\item Per ogni gene dei genotipi selezionati al passo 2. viene estratto un numero casuale $r_2$ tra zero ed uno. Se $r_2 < p_{gn}$ il gene viene mutato, di una quantità pari a $r_3 \cdot (mut_{max} \cdot 2) - mut_{max}$, dove $r_3$ è un numero casuale tra zero ed uno. Tale quantità viene aggiunta al valore del gene. Nel nostro caso non c'è un limite al valore che i geni possono assumere. 
 \end{enumerate}
 In \autoref{crossover}, per fare in modo di non perdere i progressi fatti dalle generazioni precedenti, i genotipi degli $m$ individui migliori venivano direttamente passati nella generazione successiva. Essi non devono quindi venire mutati. Per tale motivo l'algoritmo per la mutazione proposto in precedenza non viene eseguito per i primi $m$ genotipi nella nuova generazione, che non saranno perciò mutati.
-\subsection{Valori dei parametri}
+\subsection{Valori dei parametri} \label{valore-dei-parametri}
 In questa sezione verranno esplicitati i valori dei parametri dell'algoritmo genetico precedentemente illustrato. Tali parametri sono stati utilizzati per le prove sperimentali, descritte in \autoref{risultati}. Il valore di tali parametri non è stato sperimentalmente ricavato tramite \emph{fine tuning}, e perciò non necessariamente rappresentano i migliori valori possibili. La maggior parte di tali valori sono stati ricavati da quelli utilizzati in \cite{arztRepo}, o tramite alcuni semplici test sperimentali.
 
 \begin{center}
@@ -225,7 +225,29 @@ I tracciati hanno lunghezze diverse, e quindi le corrispettive \emph{evaluation}
 \end{figure}
 
 
-\section{Conclusioni}
+\section{Conclusioni} \label{conclusions}
+
+Siamo complessivamente soddisfatti del lavoro svolto: grazie all'algoritmo genetico sviluppato, le auto riescono a completare tutti e quatto i circuiti da noi creati. Più nel dettaglio, i più difficili vengono completati, in media, attorno alla trentesima generazione.
+
+\subsection*{Sviluppi futuri}
+
+Per quanto concerne gli sviluppi futuri, si individuano due modalità principali per estendere il sistema realizzato: modifiche all'algoritmo genetico o aggiunta di nuove funzionalità.
+
+\subsubsection*{Algoritmo genetico} 
+
+\begin{itemize}
+	\item \textbf{Tuning dei parametri} : nonostante l'algoritmo genetico realizzato abbia conferito buoni risultati, si potrebbe indagare sulla bontà dei parametri che esso utilizza, elencati in \autoref{valore-dei-parametri}. Siccome l'algoritmo si basa su nozioni probabilistiche, tali parametri svolgono un ruolo fondamentale nella fase di evoluzione. A causa di vincoli temporali non è stato possibile, però, tarare questi parametri nel modo più accurato.
+	\item \textbf{Nuovi operatori di selezione, crossover e mutazione} : le fasi di selezione, crossover e mutazione possono essere svolte in svariati modi, illustrati in parte in \autoref{stato-dell-arte}. Anche in questo caso, a causa di vincoli temporali, sono stati scelti i tre operatori in base alle motivazioni illustrate in \autoref{evolution}. Sarebbe quindi opportuno testare la bontà di strategie differenti per la fase di evoluzione.
+\end{itemize}
+ 
+
+\subsubsection*{Nuove funzionalità}
+
+\begin{itemize}
+	\item \textbf{Realizzazione di una gara} : allo stato attuale, l'obiettivo delle auto è quello di completare il tracciato senza dare importanza al tempo impiegato. Nel caso si volesse realizzare una gara tra auto, sarebbe necessario modificare la strategia utilizzata per il calcolo dell'evaluation, tenendo conto anche della velocità media delle auto in modo da premiare quelle più veloci.
+	\item \textbf{Livello di energia} : si può pensare di assegnare un certo livello di energia ad ogni auto, non sufficiente per completare il tracciato. Ogni auto avrà la possibilità, in qualunque momento, di procedere alla ricarica (possibile una sola volta). Durante la ricarica essa rimarrà ferma per un dato periodo di tempo. Quindi, oltre a determinare velocità e direzione del prossimo spostamento, ogni auto dovrà valutare il momento più opportuno per eseguire la ricarica.
+	\item \textbf{Utilizzo di più tipologie di veicoli} : allo stato attuale, è possibile far correre sul tracciato solo un tipo predefinito di auto, avente una certa dimensione e caratterizzata da una propria velocità massima e da un proprio angolo massimo di sterzatura. Sarebbe interessante progettare ed aggiungere nuove tipologie di veicoli, aventi dimensione, velocità massima e sterzatura massima differenti. In aggiunta, ogni tipologia potrebbe essere evoluta in modo completamente indipendente dalle altre. 
+\end{itemize}
 
 \newpage
 \begin{thebibliography}{1}
