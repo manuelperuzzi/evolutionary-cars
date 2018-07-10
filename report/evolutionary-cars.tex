@@ -64,7 +64,7 @@ Questo documento è la relazione del progetto Evolutionary Cars, realizzato per 
 
 \section{Stato dell'arte} \label{stato-dell-arte}
 In questa sezione verrà eseguita una breve disamina della letteratura presente in materia di algoritmi evolutivi e di robotica evolutiva. Questa sezione non mira ad essere un elenco esaustivo di tutte le tecniche presenti in letteratura riguardo a tali argomenti, ma piuttosto una discussione degli aspetti più importanti e applicabili al nostro progetto. 
-\subsection*{Algoritmi genetici}
+\subsection*{Algoritmi genetici} \label{algoritmi-genetici}
 Gli algoritmi genetici fanno parte della più ampia famiglia degli algoritmi evolutivi, e basano i loro principi sul processo di evoluzione naturale. Essi sono algoritmi \emph{metaeuristici}, ovvero fanno da base alla generazione di algoritmi \emph{euristici}. Tali algoritmi compiono una ricerca locale nello spazio delle soluzioni, e cercano di trovare la soluzione ottima al problema in esame. Dato che la ricerca non è comprensiva di tutte le possibili soluzioni, non è garantito che l'ottimo globale del problema sia raggiunto, ma ci limita ad una sua approssimazione. 
 
 Originariamente gli algoritmi genetici vennero utilizzati per problemi di ottimizzazione, ma con il passare degli anni il loro utilizzo si è esteso fino a comprendere la progettazione di componenti elettronici \cite{antenna} e svariati altri ambiti di ricerca.
@@ -97,6 +97,23 @@ Una introduzione comprensiva agli algoritmi genetici può essere trovata in \cit
 \end{itemize}
 Esistono numerose altre tecniche connesse con gli algoritmi genetici, ma per la vastità dell'argomento non è stato possibile raggiungere un elevato livello di dettaglio.
 \subsection*{Robotica evolutiva}
+
+Gli aspetti da prendere in considerazione durante la fase di progettazione di un robot sono molteplici: occorre determinare quale sia la migliore morfologia per il robot in relazione al task che esso deve affrontare; è necessario definire natura, numero e posizione dei suoi sensori così come l'architettura di controllo preposta al governo del robot stesso. Tutti questi fattori sono inevitabilmente correlati tra loro e contribuiscono, insieme, al comportamento risultante del robot. Conseguentemente, piccole modifiche ad una di queste parti può influenzare fortemente il funzionamento delle altre. Come accennato in \cite{ERWWW}, riuscire a completare la fase di progettazione di un robot seguendo un approccio olistico costituisce una delle maggiori sfide nel campo della robotica.  
+
+Uno dei possibili modi che permettono di affrontare questa sfida sta nell'adottare un approccio \emph{nature-inspired}, traendo spunto dagli animali e dal meccanismo che ha portato alla loro apparizione: l'evoluzione. Nel campo della robotica, tale approccio prende il nome di robotica evolutiva. Come specificato in \cite{ERNolfi}, per robotica evolutiva (RE) s'intende un approccio olistico alla progettazione di robot basato sui principi evolutivi di selezione e variazione. Più nello specifico, la parte evolutiva di un sistema RE si basa sull'utilizzo di un algoritmo genetico, descritto in \autoref{algoritmi-genetici}. 
+
+Sebbene l'obiettivo a lungo termine della RE sia quello di proporre una metodologia comune per la progettazione di robot, nella pratica ci si limita, a volte, ad utilizzarla per l'apprendimento di un \emph{behavior} desiderato da parte dei robot stessi. In questo caso, risulta essere conveniente ricorrere all'utilizzo di rete neurali come architettura di controllo dei robot, grazie alla loro versatilità e ai pochi vincoli imposti sul processo evolutivo \cite{ERWWW}.
+
+\subsubsection*{Sfide}
+
+In \cite{ERWWW} vengono elencate e discusse le principali sfide della RE, riportate di seguito.
+\begin{itemize}
+	\item \textbf{Reality Gap} : qualora venga utilizzato un approccio RE per progettazione e sviluppo di robot, quasi nella totalità dei casi
+	si ricorre inizialmente all'utilizzo di un simulatore per l'evoluzione dei genotipi dei robot stessi, sia per questioni temporali che economiche. Alla fine dell'evoluzione, viene selezionato il genotipo del robot migliore, che verrà assegnato ad un robot fisico per avere il comportamento corrispondente. L'utilizzo di un simulatore però può portare alla presenza di un problema conosciuto come reality gap: l'algoritmo genetico potrebbe sfruttare imprecisioni del simulatore stesso nell'evolvere i robot virtuali, che poi finiranno per non comportarsi come desiderato una volta installati nel mondo reale.
+	\item \textbf{Evolvability} : nonostante la RE sia fortemente ispirata al concetto di evoluzione in biologia, una delle più grandi sfide della RE rimane quella di riuscire a progettare sistemi artificiali che si adattino a cambiamenti nell'ambiente e alla presenza di nuove \emph{evolutionary challanges} tanto velocemente quanto le specie naturali.
+	\item \textbf{Open-ended Evolution}: l'evoluzione naturale è un processo senza limiti temporali precisi (\emph{open-ended}), costantemente in grado di portare innovazioni nelle specie, siano esse morfologiche o comportamentali. Nonostante ciò sia facilmente osservabile in natura, non è affatto chiaro quali siano i principi che permettano all'evoluzione di persistere nel tempo. Capire questi principi e integrarli al campo della RE rimane una sfida aperta.
+\end{itemize}
+
 \section{Architettura} \label{architecture}
 In questa sezione verrà illustrata l'architettura generale del sistema. La progettazione è stata effettuata in modo da isolare gli aspetti chiave da quelli relativi all'ambiente di esecuzione. Di conseguenza, il sistema risulta suddiviso in due sottoparti principali: \emph{core} e ambiente di esecuzione. D'altro canto, la parte relativa all'ambiente di esecuzione si rivela necessaria per permettere al sistema di adattarsi ed essere eseguito in un certo ambiente, sia esso reale o virtuale. Segue una breve descrizione dei componenti del sistema.
 \begin{description}
@@ -302,6 +319,10 @@ Per quanto concerne gli sviluppi futuri, si individuano due modalità principali
 	
 	\bibitem{ourRepo}{Gabriele Graffieti, Alfredo Maffi, Manuel Peruzzi \emph{evolutionary-cars} \\ URL:  \url{https://github.com/manuelperuzzi/evolutionary-cars}\\ Ultima visita: 9 Luglio 2018}
 	
+	\bibitem{ERWWW}{Stephane Doncieux, Nicolas Bredeche, Jean-Baptiste Mouret, Gusz Eiben, \emph{Evolutionary robotics: what, why, and where to}, 2015} 
+	
+	\bibitem{ERNolfi}{Stefano Nolfi, Dario Floreano, \emph{Evolutionary Robotics: The Biology, Intelligence, and Technology of Self-Organizing Machines.}, 2000}
+
 \end{thebibliography}
 
 \end{document}
