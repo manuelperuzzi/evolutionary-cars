@@ -96,7 +96,15 @@ Una introduzione comprensiva agli algoritmi genetici può essere trovata in \cit
 	\item \textbf{Mutazione}: una volta ottenuta una nuova generazione a partire da quella precedente, i suoi componenti possono essere mutati, in modo da mimare le mutazioni genetiche casuali che avvengono in natura. Anche in questo caso esistono diversi metodi per la mutazione, i più comuni dei quali sono l'aggiunta di un valore casuale al gene (preso da una distribuzione uniforme o gaussiana), la sostituzione di un gene con un valore casuale o, in modo drastico, l'inversione dei bit di tutto il genotipo (tale operatore può essere utilizzato solamente se l'encoding del genotipo è binario).
 \end{itemize}
 Esistono numerose altre tecniche connesse con gli algoritmi genetici, ma per la vastità dell'argomento non è stato possibile raggiungere un elevato livello di dettaglio.
+
 \subsection*{Robotica evolutiva}
+In \cite{PhysicalRobotEvolution} vengono affrontate le sfide e le difficoltà derivanti dall'utilizzo di un approccio di robotica evolutiva su robot reali. Rispetto all'esecuzione in un ambiente simulato, il processo di evoluzione può durare anche dei mesi, necessitando di hardware specifico e resistente; oltre alla questione di definizione di una \emph{fitness function} rilevante, compito non banale in un ambiente reale. La complessità del robot svolge un ruolo chiave nel processo, in quanto associare un robot complesso ad un cervello inizialmente non esistente si scontra con gli studi evoluzionari, che hanno mostrato come negli organismi biologici vi sia una graduale co-evoluzione di corpo e mente. Per questo motivo, Floreano \emph{et al.} hanno preferito utilizzare un robot semplice con i soli sensori e attuatori necessari allo scopo. Hanno realizzato un comportamento di navigazione con \emph{obstacle avoidance}, facendo uso delle tecniche di \emph{fitness scaling}, \emph{roulette wheel selection}, \emph{biased mutations} e \emph{one-point crossover}. Il robot è governato da una rete neurale che prende in input i valori dei sensori, per poi fornire in output la potenza da applicare sui due motori di cui il robot è provvisto.
+
+In \cite{TorcsController} è analizzato il meccanismo di controllo di un robot virtuale all'interno di una gara automobilistica, simulata tramite la piattaforma \emph{TORCS}\footnote{\url{http://torcs.sourceforge.net/}}. In particolare, è proposta una strategia evolutiva per l'ottimizzazione dei parametri chiave del meccanismo di controllo, in modo che il veicolo possa conseguire dei buoni risultati in ognuno dei sei tracciati messi a disposizione dal simulatore. Kim \emph{et al.} hanno proceduto determinando dei set di parametri ottimali per ogni specifico circuito, per poi scegliere il set di parametri definito come il più generale, ovvero quello che garantisce risultati accettabili su tutti i tracciati. I set di parametri ottimali per ogni circuito sono stati soggetti alle fasi di selezione e mutazione. In particolare è stata utilizzata una tecnica \emph{self-adaptive}, nella quale i dieci migliori individui (su una popolazione di venti), hanno subito una \emph{two-stage mutatation}: ad ogni iterazione, al valore di ogni parametro è stata aggiunta una variabile casuale, condizionata da un valore di peso, anch'esso modificato durante il processo evolutivo.
+
+Negli ultimi anni, la robotica evolutiva non è più considerata come un argomento relativo ad un ambito strettamente di ricerca, ma è diventata una tecnica di uso comune, come dimostrato dai numerosi progetti nei quali è utilizzata, ad esempio \cite{arztRepo}. In tale progetto è realizzata una simulazione 2D in Unity\footnote{\url{https://unity3d.com/}}, nella quale delle auto imparano a guidare all'interno di un tracciato. Le auto sono controllate da una rete neurale \emph{feedforward}. I pesi della rete sono assegnati tramite l'utilizzo di un algoritmo genetico.
+
+
 \section{Architettura} \label{architecture}
 In questa sezione verrà illustrata l'architettura generale del sistema. La progettazione è stata effettuata in modo da isolare gli aspetti chiave da quelli relativi all'ambiente di esecuzione. Di conseguenza, il sistema risulta suddiviso in due sottoparti principali: \emph{core} e ambiente di esecuzione. D'altro canto, la parte relativa all'ambiente di esecuzione si rivela necessaria per permettere al sistema di adattarsi ed essere eseguito in un certo ambiente, sia esso reale o virtuale. Segue una breve descrizione dei componenti del sistema.
 \begin{description}
@@ -290,17 +298,21 @@ Per quanto concerne gli sviluppi futuri, si individuano due modalità principali
 	
 	\bibitem{introGA} Melanie Mitchell, \emph{An Introduction to Genetic Algorithms}, 1998.
 	
-	\bibitem{understandingInt} Rolf Pfeifer, Christian Scheier \emph{Understanding Intelligence}, 1999
+	\bibitem{understandingInt} Rolf Pfeifer, Christian Scheier \emph{Understanding Intelligence}, 1999.
 	
-	\bibitem{fitnessSurvey} Andrew L. Nelson, Gregory J. Barlow, Lefteris Doitsidis \emph{Fitness functions in evolutionary robotics: A survey and analysis}, 2008
+	\bibitem{fitnessSurvey} Andrew L. Nelson, Gregory J. Barlow, Lefteris Doitsidis \emph{Fitness functions in evolutionary robotics: A survey and analysis}, 2008.
 	
-	\bibitem{GAsurvey} M. Srinivas, L.M. Patnaik \emph{Genetic Algorithms: a Survey}, 1994
+	\bibitem{GAsurvey} M. Srinivas, L.M. Patnaik \emph{Genetic Algorithms: a Survey}, 1994.
 	
-	\bibitem{SelectionSurvey} Thomas B\"{a}ck, \emph{Selective Pressure in Evolutionary Algorithms: A Characterization of Selection Mechanisms}, 1994
+	\bibitem{SelectionSurvey} Thomas B\"{a}ck, \emph{Selective Pressure in Evolutionary Algorithms: A Characterization of Selection Mechanisms}, 1994.
 	
-	\bibitem{arztRepo}{Samuel Arzt, \emph{Applying Evolutionary Artificial Neural Networks} \\ URL:  \url{https://github.com/ArztSamuel/Applying_EANNs}\\ Ultima visita: 8 Luglio 2018}
+	\bibitem{PhysicalRobotEvolution} Dario Floreano, Francesco Mondada \emph{Automatic Creation of an Autonomous Agent: Genetic Evolution of a Neural Network Driven Robot}, 1994.
 	
-	\bibitem{ourRepo}{Gabriele Graffieti, Alfredo Maffi, Manuel Peruzzi \emph{evolutionary-cars} \\ URL:  \url{https://github.com/manuelperuzzi/evolutionary-cars}\\ Ultima visita: 9 Luglio 2018}
+	\bibitem{TorcsController} Tae Seong Kim, Joong Chae Na, Kyung Joong Kim \emph{Optimization of an Autonomous Car Controller using a Self-Adaptive Evolutionary Strategy}, 2012.
+	
+	\bibitem{arztRepo}{Samuel Arzt, \emph{Applying Evolutionary Artificial Neural Networks}, 2017 \\ URL:  \url{https://github.com/ArztSamuel/Applying_EANNs}\\ Ultima visita: 8 Luglio 2018.}
+	
+	\bibitem{ourRepo}{Gabriele Graffieti, Alfredo Maffi, Manuel Peruzzi \emph{evolutionary-cars}, 2018 \\ URL:  \url{https://github.com/manuelperuzzi/evolutionary-cars}\\ Ultima visita: 9 Luglio 2018.}
 	
 \end{thebibliography}
 
