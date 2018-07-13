@@ -1,0 +1,339 @@
+% !TeX spellcheck = it_IT
+\documentclass[a4paper,12pt]{article}
+
+\usepackage{alltt, fancyvrb, url}
+\usepackage{graphicx}
+\usepackage{algorithmic}
+\usepackage[utf8]{inputenc}
+\usepackage{titling}
+\usepackage{fancyhdr}
+\usepackage{fontenc}
+\usepackage{amsmath,mathtools,algorithm}
+\usepackage{amssymb}
+\usepackage{longtable}
+\usepackage{setspace}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{eurosym}
+\usepackage{array}
+\usepackage[referable]{threeparttablex}
+\usepackage{pifont}
+\usepackage{siunitx}
+\usepackage{subcaption}
+
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+
+\usepackage[italian,hidelinks]{hyperref}
+
+\usepackage[italian]{babel}
+\usepackage[italian]{cleveref}
+
+
+\pretitle{%
+	\begin{center}
+		\LARGE
+	}
+\posttitle{\end{center}}
+
+
+\title{\vspace{-5em}\Huge \textbf{Evolutionary Cars}
+}
+\author{
+	Gabriele Graffieti \\ \small \url{gabriele.graffieti@studio.unibo.it}
+	\vspace{15pt}
+	\\
+	Alfredo Maffi \\ \small \url{alfredo.maffi@studio.unibo.it}
+	\vspace{15pt}
+	\\
+	Manuel Peruzzi \\ \small \url{manuel.peruzzi@studio.unibo.it}
+}
+
+\date{}
+
+\begin{document}
+
+\maketitle
+\pagenumbering{arabic}
+\tableofcontents
+\newpage
+
+\section{Introduzione}
+
+Questo documento è la relazione del progetto Evolutionary Cars, realizzato per il corso di Sistemi Intelligenti Robotici, erogato dalla facoltà di Ingegneria e Scienze Informatiche dell'Università di Bologna (A.A. 2017/2018). Lo scopo del progetto è quello di realizzare una simulazione nella quale delle auto (2D) imparino a guidare lungo un tracciato, evitandone i muri, attraverso la metodologia \emph{evolutionary robotics}. Più nel dettaglio, l'obiettivo è quello di pilotare ogni auto attraverso una rete neurale separata, ed evolvere i pesi della stessa attraverso un algoritmo genetico, di generazione in generazione.
+
+\section{Stato dell'arte} \label{stato-dell-arte}
+In questa sezione verrà eseguita una breve disamina della letteratura presente in materia di algoritmi evolutivi e di robotica evolutiva. Questa sezione non mira ad essere un elenco esaustivo di tutte le tecniche presenti in letteratura riguardo a tali argomenti, ma piuttosto una discussione degli aspetti più importanti e applicabili al nostro progetto. 
+\subsection{Algoritmi genetici} \label{algoritmi-genetici}
+Gli algoritmi genetici fanno parte della più ampia famiglia degli algoritmi evolutivi, e basano i loro principi sul processo di evoluzione naturale. Essi sono algoritmi \emph{metaeuristici}, ovvero fanno da base alla generazione di algoritmi \emph{euristici}. Tali algoritmi compiono una ricerca locale nello spazio delle soluzioni, e cercano di trovare la soluzione ottima al problema in esame. Dato che la ricerca non è comprensiva di tutte le possibili soluzioni, non è garantito che l'ottimo globale del problema sia raggiunto, ma ci si limita ad una sua approssimazione. 
+
+Originariamente gli algoritmi genetici vennero utilizzati per problemi di ottimizzazione, ma con il passare degli anni il loro utilizzo si è esteso fino a comprendere la progettazione di componenti elettronici \cite{antenna} e svariati altri ambiti di ricerca.
+
+Una introduzione comprensiva agli algoritmi genetici può essere trovata in \cite{introGA} e \cite{understandingInt}. Essi si compongono principalmente di cinque fasi: 
+\begin{itemize}
+	\item \textbf{Inizializzazione} (o \emph{encoding}): fase in cui si codificano le variabili del problema di ottimizzazione, in modo che esse possano essere contenute nel \emph{genotipo} di ogni singolo individuo. La modalità di encoding è diversa da problema a problema, e non può essere definita a priori. 
+	\item \textbf{Calcolo della fitness}: ad ogni genotipo deve essere associato un valore, che indica quanto la soluzione ad esso associata sia vicina a quella ottima. Il calcolo della fitness, quindi, dà come risultato la bontà di ogni genotipo. Esistono numerosissime funzioni per calcolare la fitness \cite{fitnessSurvey}, il più delle volte dipendenti dal problema in esame.
+	\item \textbf{Selezione}: una porzione della popolazione corrente è selezionata per la successiva fase di riproduzione. Esistono molti operatori di selezione \cite{SelectionSurvey}, i più comuni ed utilizzati sono: 
+	\begin{itemize}
+		\item \emph{Proportional Selection (o roulotte wheel)}: la probabilità di ogni genotipo di essere selezionato è proporzionale alla sua fitness, ed è dato da: 
+		\begin{equation}
+			p_i = \frac{\Phi(a_i)}{\sum_{j = 1}^{n}\Phi(a_j)}
+		\end{equation}
+		con $\Phi(a_i) = $ fitness dell'individuo $i$.
+		\item \emph{Tournament Selection}: viene selezionato il miglior individuo da un gruppo di $q \ge 1$ individui scelti in modo casuale dalla popolazione corrente. Il processo viene ripetuto $n$ volte, fino a ottenere una nuova popolazione. Ciò consente anche ad individui con bassa fitness di essere selezionati per le generazioni successive (sopratutto con $q$ basso).
+		\item \emph{Rank Selection}: la selezione dei nuovi individui si basa sul \emph{rank} della loro fitness, invece che sul valore della stessa. Ad esempio, al genotipo con fitness più alta viene assegnato il valore $n$, a quello con la seconda fitness più alta $n-1$ e così via. Le probabilità di ogni genotipo di essere selezionati sono date dal valore a loro assegnato, diviso $\sum_{j = 1}^{n}j$.
+		\item \emph{Truncation Selection}: viene selezionata una data porzione della popolazione, formata dagli individui a fitness più alta (es. la metà, o un terzo della popolazione). In alcuni casi viene fissato un valore di fitness di soglia, e vengono selezionati gli individui la cui fitness è maggiore a tale soglia. 
+		\item \emph{Elitism Selection}: vengono selezionati gli $m$ migliori individui in base alla loro fitness, e vengono immediatamente immessi nella generazione successiva, senza che ad essi sia applicata mutazione. In questo modo non si presenta il rischio che i risultati raggiunti vengano persi, a causa di ricombinazione e mutazione dei genotipi. 
+	\end{itemize}
+	\item \textbf{Crossover}: gli individui selezionati nella fase precedente vengono combinati tra loro, in modo da generare nuovi individui. Anche in questo caso esistono diversi operatori di crossover \cite{GAsurvey}, ma i più utilizzato sono: 
+	\begin{itemize}
+		\item \emph{One-point Crossover}: viene scelto casualmente un punto in cui spezzare i genotipi dei due genitori, e i due pezzi di genotipo sono scambiati tra i due genitori per produrre due figli: uno con la parte iniziale del genotipo del primo genitore, e la parte finale del secondo, e l'altro con la prima parte del secondo genitore, e la seconda parte del primo. 
+		\item \emph{Two-point Crossover}: vengono scelti casualmente due punti distinti in cui spezzare in tre parti i genotipi dei genitori. Tali parti sono poi ricombinate nella prole. 
+		\item \emph{k-point Crossover}: generalizzazione del \emph{two-point crossover} descritto in precedenza, con $k \ge 3$ punti di splitting.
+		\item \emph{Uniform Crossover}: ogni gene all'interno del genotipo dei figli è indipendentemente scelto da uno dei due genitori, secondo una distribuzione di probabilità. Di solito la probabilità di scegliere il gene da un particolare genitore è del 50\%, ma in molti casi è utile che essa sia diversa da tale valore, in modo da avere figli più simili ai genitori.  
+	\end{itemize}
+	Finora si è considerato il crossover tra due soli genitori, il quale produce solitamente due eredi. Nulla vieta di utilizzare più genotipi come genitori, e produrre più eredi da essi. In \cite{GAsurvey} si discute sulla necessità dell'operatore di crossover negli algoritmi genetici, dato che in alcuni casi esso da risultati peggiori della sola mutazione. Tale questione è ancora aperta, ma è una questione puramente teorica che esula da questa trattazione.
+	\item \textbf{Mutazione}: una volta ottenuta una nuova generazione a partire da quella precedente, i suoi componenti possono essere mutati, in modo da mimare le mutazioni genetiche casuali che avvengono in natura. Anche in questo caso esistono diversi metodi per la mutazione, i più comuni dei quali sono l'aggiunta di un valore casuale al gene (preso da una distribuzione uniforme o gaussiana), la sostituzione di un gene con un valore casuale o, in modo drastico, l'inversione dei bit di tutto il genotipo (tale operatore può essere utilizzato solamente se l'encoding del genotipo è binario).
+\end{itemize}
+Esistono numerose altre tecniche connesse con gli algoritmi genetici, ma per la vastità dell'argomento non è stato possibile raggiungere un elevato livello di dettaglio.
+
+\subsection{Robotica evolutiva}
+
+Gli aspetti da prendere in considerazione durante la fase di progettazione di un robot sono molteplici: occorre determinare quale sia la migliore morfologia per il robot in relazione al task che esso deve affrontare; è necessario definire natura, numero e posizione dei suoi sensori, così come l'architettura di controllo preposta al governo del robot stesso. Tutti questi fattori sono inevitabilmente correlati tra loro e contribuiscono, insieme, al comportamento risultante del robot. Conseguentemente, piccole modifiche ad una di queste parti può influenzare fortemente il funzionamento delle altre. Come accennato in \cite{ERWWW}, riuscire a completare la fase di progettazione di un robot seguendo un approccio olistico costituisce una delle maggiori sfide nel campo della robotica.  
+
+Uno dei possibili modi che permettono di affrontare questa sfida sta nell'adottare un approccio \emph{nature-inspired}, traendo spunto dagli animali e dal meccanismo che ha portato alla loro apparizione: l'evoluzione. Nel campo della robotica, tale approccio prende il nome di robotica evolutiva. Come specificato in \cite{ERNolfi}, per robotica evolutiva (RE) s'intende un approccio olistico alla progettazione di robot basato sui principi evolutivi di selezione e variazione. Più nello specifico, la parte evolutiva di un sistema RE si basa sull'utilizzo di un algoritmo genetico, descritto in \autoref{algoritmi-genetici}. 
+
+Sebbene l'obiettivo a lungo termine della RE sia quello di proporre una metodologia comune per la progettazione di robot, nella pratica ci si limita, a volte, ad utilizzarla per l'apprendimento di un \emph{behavior} desiderato da parte dei robot stessi. In questo caso, risulta essere conveniente ricorrere all'utilizzo di reti neurali come architettura di controllo dei robot, grazie alla loro versatilità e ai pochi vincoli imposti sul processo evolutivo \cite{ERWWW}.
+
+\subsubsection{Sfide}
+
+In \cite{ERWWW} vengono elencate e discusse le principali sfide della RE, riportate di seguito.
+\begin{itemize}
+	\item \textbf{Reality Gap} : qualora venga utilizzato un approccio RE per progettazione e sviluppo di robot, quasi nella totalità dei casi
+	si ricorre inizialmente all'utilizzo di un simulatore per l'evoluzione dei genotipi dei robot stessi, sia per questioni temporali che economiche. Alla fine dell'evoluzione, viene selezionato il genotipo del robot migliore, che verrà assegnato ad un robot fisico per avere il comportamento corrispondente. L'utilizzo di un simulatore però può portare alla presenza di un problema conosciuto come reality gap: l'algoritmo genetico potrebbe sfruttare imprecisioni del simulatore stesso nell'evolvere i robot virtuali, che poi finiranno per non comportarsi come desiderato una volta installati nel mondo reale.
+	\item \textbf{Evolvability} : nonostante la RE sia fortemente ispirata al concetto di evoluzione in biologia, una delle più grandi sfide della RE rimane quella di riuscire a progettare sistemi artificiali che si adattino a cambiamenti nell'ambiente e alla presenza di nuove \emph{evolutionary challanges} tanto velocemente quanto le specie naturali.
+	\item \textbf{Open-ended Evolution}: l'evoluzione naturale è un processo senza limiti temporali precisi (\emph{open-ended}), costantemente in grado di portare innovazioni nelle specie, siano esse morfologiche o comportamentali. Nonostante ciò sia facilmente osservabile in natura, non è affatto chiaro quali siano i principi che permettano all'evoluzione di persistere nel tempo. Capire questi principi e integrarli al campo della RE rimane una sfida aperta.
+\end{itemize}
+
+\subsubsection{Casi di studio}
+
+In \cite{PhysicalRobotEvolution} vengono affrontate le sfide e le difficoltà derivanti dall'utilizzo di un approccio di robotica evolutiva su robot reali. Rispetto all'esecuzione in un ambiente simulato, il processo di evoluzione può durare anche dei mesi, necessitando di hardware specifico e resistente; oltre alla questione di definizione di una \emph{fitness function} rilevante, compito non banale in un ambiente reale. La complessità del robot svolge un ruolo chiave nel processo, in quanto associare un robot complesso ad un cervello inizialmente non esistente si scontra con gli studi evoluzionari, che hanno mostrato come negli organismi biologici vi sia una graduale co-evoluzione di corpo e mente. Per questo motivo, in \cite{PhysicalRobotEvolution} Floreano \emph{et al.} hanno preferito utilizzare un robot semplice con i soli sensori e attuatori necessari allo scopo. Hanno realizzato un comportamento di navigazione con \emph{obstacle avoidance}, facendo uso delle tecniche di \emph{fitness scaling}, \emph{roulette wheel selection}, \emph{biased mutations} e \emph{one-point crossover}. Il robot è governato da una rete neurale che prende in input i valori dei sensori, per poi fornire in output la potenza da applicare sui due motori di cui il robot è provvisto.
+
+In \cite{TorcsController} è analizzato il meccanismo di controllo di un robot virtuale all'interno di una gara automobilistica, simulata tramite la piattaforma \emph{TORCS}\footnote{\url{http://torcs.sourceforge.net/}}. In particolare, è proposta una strategia evolutiva per l'ottimizzazione dei parametri chiave del meccanismo di controllo, in modo che il veicolo possa conseguire dei buoni risultati in ognuno dei sei tracciati messi a disposizione dal simulatore. In \cite{TorcsController} Kim \emph{et al.} hanno proceduto determinando dei set di parametri ottimali per ogni specifico circuito, per poi scegliere il set di parametri definito come il più generale, ovvero quello che garantisce risultati accettabili su tutti i tracciati. I set di parametri ottimali per ogni circuito sono stati soggetti alle fasi di selezione e mutazione. In particolare è stata utilizzata una tecnica \emph{self-adaptive}, nella quale i dieci migliori individui (su una popolazione di venti), hanno subito una \emph{two-stage mutatation}: ad ogni iterazione, al valore di ogni parametro è stata aggiunta una variabile casuale, condizionata da un valore di peso, anch'esso modificato durante il processo evolutivo.
+
+Negli ultimi anni, la robotica evolutiva non è più considerata come un argomento relativo ad un ambito strettamente di ricerca, ma è diventata una tecnica di uso comune, come dimostrato dai numerosi progetti nei quali è utilizzata, ad esempio \cite{arztRepo}. In tale progetto è realizzata una simulazione 2D in Unity\footnote{\url{https://unity3d.com/}}, nella quale delle auto imparano a guidare all'interno di un tracciato. Le auto sono controllate da una rete neurale \emph{feedforward}. I pesi della rete sono assegnati tramite l'utilizzo di un algoritmo genetico.
+
+\section{Architettura} \label{architecture}
+In questa sezione verrà illustrata l'architettura generale del sistema. La progettazione è stata effettuata in modo da isolare gli aspetti chiave da quelli relativi all'ambiente di esecuzione. Di conseguenza, il sistema risulta suddiviso in due sottoparti principali: \emph{core} e ambiente di esecuzione. D'altro canto, la parte relativa all'ambiente di esecuzione si rivela necessaria per permettere al sistema di adattarsi ed essere eseguito in un certo ambiente, sia esso reale o virtuale. Segue una breve descrizione dei componenti del sistema.
+\begin{description}
+	\item[Driver Agent]: entità preposta alla guida di un'auto. Indipendentemente dall'implementazione e dalla natura del veicolo, determina la potenza del motore e la direzione di sterzata dello stesso, a partire dalle informazioni relative alla distanza dai muri del tracciato. Ogni decisione che incide sul movimento dell'auto è determinata da una rete neurale interna, i cui pesi sono regolati in modo da aderire al genotipo dell'agente. Il driver agent può essere considerato il controller di ogni singola auto, e, dato che non è presente alcuna rappresentazione formale del mondo al suo interno, ma, al contrario, basa il suo comportamento sulle sole informazioni locali dell'auto, verrà progettato seguendo l'architettura di controllo \emph{reactive control}. 
+	\item[Neural Network]: rete neurale feedforward utilizzata per pilotare un'auto. Riceve in input cinque valori di prossimità, che descrivono lo stato dell'auto in relazione ai muri del tracciato, e produce in output i valori della forza motore e della direzione dello spostamento successivo. I pesi della rete sono inizialmente definiti in modo casuale, per poi essere adattati in corso d'opera in seguito all'evoluzione del genotipo corrispondente.
+	\item[Genotype]: insieme di informazioni che contraddistinguono il comportamento di un'auto rispetto a quello delle altre. In particolare, contiene i pesi da assegnare alla \emph{neural network} di un particolare agente.
+	\item[Genetic Algorithm]: algoritmo finalizzato all'evoluzione dei genotipi da una generazione alla successiva. Si compone delle fasi di selezione, crossover e mutazione, che saranno discusse nel dettaglio in \autoref{evolution}.
+	\item[Controller]: può essere definito come il collante tra le parti di core e di ambiente di esecuzione del sistema. Si occupa inizialmente di istanziare l'algoritmo genetico ed un insieme di driver agent. È responsabile dell'avvio del processo di \emph{evaluation} dei genotipi, interagendo con un componente relativo alla gestione della parte di ambiente di esecuzione. Al termine di tale processo viene notificato, in modo da poter poi provvedere all'avvio della fase di evoluzione, interagendo con l'algoritmo genetico.
+\end{description}
+In \autoref{architecture-diagram} è illustrato un diagramma che descrive, in maniera informale, l'architettura del sistema. Nel progetto in esame tale architettura è stata implementata utilizzando il linguaggio \texttt{C\#}. Per quanto riguarda la parte relativa all'ambiente di esecuzione, in \autoref{simulation} verrà proposta un'infrastruttura per effettuare una simulazione del sistema.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=130mm]{./img/architecture.png}
+	\caption{Diagramma informale che rappresenta le relazioni tra i componenti che formano l'architettura del sistema. Nella notazione utilizzata, le frecce tratteggiate indicano una notifica dell'avvenimento di un certo evento, a differenza delle frecce continue che si riferiscono a relazioni di dipendenza. Nel diagramma sono rappresentati solamente i componenti relativi alla parte \emph{core} del sistema; quelli relativi all'ambiente di esecuzione non sono trattati in questo diagramma e sono, perciò, stati collassati nel blocco \emph{Execution Environment}.  \label{architecture-diagram}}
+\end{figure}
+
+\section{Evoluzione} \label{evolution}
+In questa sezione verrà illustrata più nel dettaglio la parte inerente all'evoluzione del sistema, e al conseguente algoritmo genetico utilizzato. Molte scelte fatte si basano sul progetto \emph{Applying Evolutionary Artificial Neural Networks} \cite{arztRepo}, che è stato preso come punto di riferimento e come base per il nostro elaborato. Come accennato in precedenza la fase di evoluzione si divide in tre sottofasi distinte: \emph{selezione}, \emph{incrocio} (o \emph{crossover}) e \emph{mutazione}. Prima di procedere all'illustrazione di tali fasi, però, è necessario introdurre i parametri da noi utilizzati per valutare la bontà di un genotipo, e di conseguenza la sua fitness.
+\subsection{Evaluation e Fitness} \label{evFitness}
+L'\emph{evaluation} rappresenta la bontà di un genotipo alla fine della fase di valutazione, ovvero, nel nostro caso, quanto bene l'auto è riuscita ad evitare i muri. Essa viene calcolata sulla base della distanza percorsa dall'auto, prendendo come origine il punto da cui essa parte all'inizio della fase di valutazione. Più un'auto farà strada prima di collidere contro un muro, maggiore sarà l'\emph{evaluation} del suo genoma. 
+
+La fitness può essere calcolata in molti modi diversi, o addirittura fatta coincidere con l'\emph{evaluation}. L'approccio da noi scelto consiste nel calcolare la fitness come rapporto tra l'\emph{evaluation} di un individuo e l'\emph{evaluation} media della generazione. 
+\begin{equation}
+	fitness_i = \frac{evaluation_i}{\overline{ev}}, \hspace{2em} \overline{ev} = \frac{\sum_{j = 1}^{n} evaluation_j }{n}
+\end{equation}
+In questo modo la fitness di un individuo sarà maggiore di uno se la sua \emph{evaluation} è superiore alla media di tale generazione, ed inferiore nel caso contrario. Ciò è necessario per il metodo di selezione, illustrato di seguito.
+\subsection{Selezione}
+La fase di selezione, prendendo spunto da \cite{arztRepo}, avviene creando una generazione intermedia di potenziali ``\emph{genitori}'', che poi, riproducendosi tra loro, daranno vita ad una nuova generazione. Il metodo utilizzato per la creazione della generazione intermedia si basa su una sorta di \emph{proportional selection}, dato che gli individui a fitness maggiore vengono inseriti più volte nella popolazione intermedia. In aggiunta a ciò, per mantenere una differenziazione genetica più elevata, vengono aggiunti alcuni genotipi di individui scelti in modo casuale.  
+
+Come prima cosa vengono aggiunti alla generazione intermedia tutti i genotipi degli individui con fitness maggiore di uno (ovvero con \emph{evaluation} superiore alla media), in modo proporzionale al loro valore di fitness. Ciò significa che il genotipo di un individuo sarà inserito nella generazione intermedia tante volte quanto è il suo valore di fitness troncato all'intero. Ad esempio, se un individuo ha fitness 3.247, il suo genotipo sarà inserito nella generazione intermedia $\lfloor3.247\rfloor = 3$ volte. 
+
+Dopo questa prima selezione ne viene fatta un'altra, in modo casuale. Come detto in precedenza, ciò è utile per mantenere i genotipi differenziati tra loro, e consente di esplorare strade che non sarebbero percorribili mantenendo soltanto i genotipi migliori. Il metodo utilizzato è il \emph{reminder stochastic sampling}, ed i genotipi da inserire nella generazione intermedia sono scelti nel seguente modo. Sia $r$ un numero casuale tra zero e uno, e $f = fitness_i - \lfloor fitness_i \rfloor$, ovvero la parte frazionaria della fitness. Se $r < f$ allora il genotipo viene inserito nella generazione intermedia.
+
+Notare come la popolazione intermedia ottenuta dopo la fase di selezione non ha dimensione fissa. Essa ha l'unico vincolo di contenere almeno due genotipi, in modo che ci sia sempre una coppia per la successiva fase di riproduzione.
+\subsection{Crossover} \label{crossover}
+Una volta ottenuta la popolazione intermedia di potenziali ``\emph{genitori}'' essi devono essere incrociati tra loro, per ottenere la nuova generazione. L'operatore di crossover da noi scelto è l'\emph{uniform crossover}, in cui ogni singolo gene è scelto dai due genitori in modo indipendente dagli altri. 
+
+Per prima cosa vengono selezionati, in modo casuale, i due genitori dalla popolazione intermedia. Ogni coppia così selezionata produce due figli nel modo seguente: 
+\begin{enumerate}
+	\item Siano parent\textsubscript{1} e parent\textsubscript{2} i due genitori e offspring\textsubscript{1} e offspring\textsubscript{2} i due discendenti.
+	\item Sia $p_{cross}$, tra zero ed uno, la probabilità di crossover.
+	\item Per ogni gene all'interno dei genotipi si estrae un numero casuale $r$, tra zero ed uno. Se $r < p_{cross}$ allora avviene il crossover, e offspring\textsubscript{1} eredita il gene da parent\textsubscript{2}, mentre offspring\textsubscript{2} lo eredita da parent\textsubscript{1}. In caso contrario offspring\textsubscript{1} eredita il gene da parent\textsubscript{1}, e offspring\textsubscript{2} lo eredita da parent\textsubscript{2}.
+	\item Una volta fatto ciò per ogni gene nel genotipo, si inseriscono i due nuovi genotipi nella nuova generazione, uno per volta, fino a raggiungere la dimensione desiderata. 
+\end{enumerate}
+Durante prove sperimentali abbiamo notato come, spesso, un genotipo molto buono vada perso nella generazione successiva, vanificando di conseguenza i progressi fatti fino a quel momento. Per risolvere tale problematica abbiamo leggermente modificato il metodo proposto in precedenza, inserendo nella nuova generazione i genotipi degli $m$ individui con la migliore fitness della generazione precedente, utilizzando quindi anche una selezione per \emph{elitismo}.
+\subsection{Mutazione} \label{mutazione}
+Dopo la composizione della nuova generazione i genotipi dei nuovi individui vengono mutati. La mutazione, all'interno di un genotipo, viene eseguita gene per gene, su basi probabilistiche. Di seguito è riportato lo pseudo-codice dell'algoritmo di mutazione:
+\begin{enumerate}
+	\item Sia $p_{gt}$ la probabilità, tra zero e uno, che un genotipo sia selezionato per la mutazione dei sui geni. Sia $p_{gn}$ la probabilità, tra zero e uno, che un gene sia mutato. Infine sia $mut_{max}$ il massimo livello di mutazione di un gene (un gene può essere mutato di massimo $\pm mut_{max}$).
+	\item Per ogni genotipo nella nuova generazione viene estratto un numero random $r_1$ tra zero ed uno. Se $r_1 < p_{gt}$ allora il genotipo è selezionato per la mutazione, altrimenti non viene mutato.
+	\item Per ogni gene dei genotipi selezionati al passo 2 viene estratto un numero casuale $r_2$ tra zero ed uno. Se $r_2 < p_{gn}$ il gene viene mutato, di una quantità pari a $r_3 \cdot (mut_{max} \cdot 2) - mut_{max}$, dove $r_3$ è un numero casuale tra zero ed uno. Tale quantità viene aggiunta al valore del gene. Nel nostro caso non c'è un limite al valore che i geni possono assumere. 
+\end{enumerate}
+In \autoref{crossover}, per fare in modo di non perdere i progressi fatti dalle generazioni precedenti, i genotipi degli $m$ individui migliori venivano direttamente passati nella generazione successiva. Essi non devono quindi venire mutati. Per tale motivo l'algoritmo per la mutazione proposto in precedenza non viene eseguito per i primi $m$ genotipi nella nuova generazione, che saranno perciò mantenuti invariati rispetto alla generazione precedente.
+\subsection{Valori dei parametri} \label{valore-dei-parametri}
+In questa sezione verranno esplicitati i valori dei parametri dell'algoritmo genetico precedentemente illustrato. Tali parametri sono stati utilizzati per le prove sperimentali, descritte in \autoref{risultati}. I valori di tali parametri non sono stati sperimentalmente ricavati tramite \emph{fine tuning}, e perciò essi non rappresentano necessariamente i migliori valori possibili. La maggior parte di tali valori sono stati ricavati da quelli utilizzati in \cite{arztRepo}, o tramite alcuni semplici test sperimentali.
+
+\begin{center}
+	\begin{tabular}{| m{2.5cm} | m{6cm} | m{2cm} |}
+		\hline
+		\textbf{Parametro} & \textbf{Commento}& \textbf{Valore} \\ \hline
+		$p_{cross}$ & Probabilità di crossover tra i geni di due genitori (vedi \autoref{crossover})  & $0.6$ \\ \hline
+		$p_{gt}$ & Probabilità che un genotipo sia selezionato per la mutazione* (vedi \autoref{mutazione})  & $1.0$ \\ \hline
+		$p_{gn}$ & Probabilità che un singolo gene sia mutato (vedi \autoref{mutazione})  & $0.3$ \\ \hline
+		$mut_{max}$ & Massimo valore di cui può essere mutato un gene (vedi \autoref{mutazione})  & $\pm 2$ \\ \hline
+		$m$ & Numero dei genotipi migliori che vengono passati direttamente nella generazione successiva (vedi \autoref{crossover})  & $1$ \\ \hline
+	\end{tabular}
+	\begin{tablenotes}
+		*Gli $m$ genotipi migliori della generazione precedente non vengono mai mutati.
+	\end{tablenotes}
+\end{center} 
+
+\section{Simulazione} \label{simulation}
+L'architettura illustrata in \autoref{architecture} mette in evidenza i componenti principali del sistema. Come anticipato, per completare l'architettura si rivela necessaria l'aggiunta di ulteriori componenti, dipendenti dall'ambiente di esecuzione. Nel progetto in esame, si è scelto di simulare l'ambiente di esecuzione attraverso l'utilizzo di un motore grafico. Il blocco \emph{Execution Environment}, presente in \autoref{architecture-diagram}, è stato raffinato nei seguenti componenti.
+\begin{description}
+	\item[Car]: rappresenta un'auto. È equipaggiata con cinque sensori di prossimità in grado di percepire la distanza da eventuali ostacoli o muri. Più nello specifico, ogni sensore è posizionato secondo una certa angolazione rispetto all'asse dell'auto, da \ang{-60} fino a \ang{+60}. In questo modo è possibile effettuare una completa operazione di \emph{sensing} nella zona frontale rispetto al veicolo. Ogni auto è associata ad un \emph{Driver Agent}, al quale deve inoltrare i valori rilevati dai sensori per ottenere indicazioni sullo spostamento da effettuare. Se dai sensori viene rilevata una collisione con i muri del tracciato, l'auto si ferma immediatamente, notificando il \emph{Race Manager}.
+	\item[Race Manager]: è il componente dedito all'esecuzione della fase di \emph{evaluation} di ogni generazione dell'algoritmo genetico. Più nel dettaglio, all'avvio ha il compito di creare auto e tracciato, mentre durante l'evaluation è responsabile del controllo dello stato di ogni auto. All'inizio di ogni iterazione, si occupa del riposizionamento di ogni auto all'inizio del tracciato. Al termine dell'iterazione, ovvero quando tutte le auto hanno segnalato una collisione o hanno terminato il tracciato, provvede ad assegnare una valutazione al genotipo corrispondente ad ogni auto e a notificare il \emph{Controller}.
+	\item[Track]: rappresenta il tracciato, circondato da muri, sul quale si muovono le auto. Su di esso sono disposti dei \emph{checkpoint}, utilizzabili per effettuare l'evaluation del genotipo di ogni auto. I checkpoint sono posizionati, in maniera uniforme, per tutta la lunghezza del tracciato. Il raggiungimento dell'ultimo di essi sancisce il completamento del tracciato.
+\end{description}
+I componenti appena descritti sono rappresentati in \autoref{simulation-diagram}, insieme all'architettura generale del sistema. Tali componenti sono stati implementati utilizzando il linguaggio \texttt{C\#}. Per quanto riguarda la fase di valutazione dei genotipi, si sono adottate come riferimento le indicazioni presenti in \autoref{evolution}. Siccome nel calcolo dell'\emph{evaluation} l'unica dimensione presa in considerazione è la distanza percorsa dalle auto, si è rivelato necessario aggiungere anche un vincolo temporale ad ogni iterazione. Seguendo questo approccio, è stato assegnato un timeout ad ogni auto, ovvero un tempo massimo per raggiungere il checkpoint successivo. Il timeout viene resettato al raggiungimento di ogni checkpoint e una sua scadenza significa che l'auto in questione non sta effettuando alcun progresso nel tracciato e quindi deve essere fermata. In questo modo, si evita che le auto rimangano in corsa pur stando ferme in un punto, forzandole a progredire nel tracciato. Il controllo relativo ai timeout è gestito dal componente \emph{Race Manager}.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=130mm]{./img/architecture-simulation.png}
+	\caption{Diagramma informale che rappresenta le relazioni tra i componenti che formano l'architettura del sistema. Nella notazione utilizzata, le frecce tratteggiate indicano una notifica dell'avvenimento di un certo evento, a differenza delle frecce continue che si riferiscono a relazioni di dipendenza. Nel diagramma i componenti caratterizzati da un colore più scuro sono quelli relativi alla simulazione, distinguibili dai restanti che costituiscono invece il \emph{core} del sistema.  \label{simulation-diagram}}
+\end{figure}
+
+In questa sezione è stata proposta una possibile architettura per la parte del sistema relativa all'ambiente di esecuzione. L'implementazione dei componenti relativi alla parte dell'ambiente di esecuzione non può essere sviluppata in maniera generale, ma contiene, necessariamente, dei riferimenti all'ambiente stesso. In questo progetto l'ambiente di esecuzione è stato simulato tramite l'utilizzo del motore grafico \emph{Godot}\footnote{\url{https://godotengine.org/}}. Nel caso si voglia adottare un differente ambiente di esecuzione, sia reale che simulato, sarà sufficiente variare l'implementazione dei componenti \emph{Car}, \emph{Race Manager} e \emph{Track} in modo da adattarli all'ambiente scelto. Non sarà necessario apportare modifiche al \emph{core}, a patto che vengano preservate le interazioni tra le due parti del sistema, descritte nell'architettura in \autoref{architecture}.
+
+\section{Risultati} \label{risultati}
+In questa sezione verranno analizzati i risultati ottenuti tramite prove sperimentali del sistema. Per gli esperimenti sono stati utilizzati quattro diversi tracciati, con diversi gradi di difficoltà (codificati in \emph{facile}, \emph{medio-facile}, \emph{medio-difficile}, \emph{difficile}). I tracciati sono visibili in \autoref{fig:tracks}. Alcuni esempi di esecuzioni del sistema sono disponibili in \cite{ourRepo}.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.475\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{./img/track01.png}
+		\caption[Network2]%
+		{{\small Circuito 1 - medio-facile}}    
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.475\textwidth}  
+		\centering 
+		\includegraphics[width=\textwidth]{./img/track02.png}
+		\caption[]%
+		{{\small Circuito 2 - facile}}
+	\end{subfigure}
+	\vskip\baselineskip
+	\begin{subfigure}[b]{0.475\textwidth}   
+		\centering 
+		\includegraphics[width=\textwidth]{./img/track03.png}
+		\caption[]%
+		{{\small Circuito 3 - medio-difficile}}
+	\end{subfigure}
+	\quad
+	\begin{subfigure}[b]{0.475\textwidth}   
+		\centering 
+		\includegraphics[width=\textwidth]{./img/track04.png}
+		\caption[]%
+		{{\small Circuito 4 - difficile}}
+	\end{subfigure}
+	\caption[]
+	{\small I tracciati utilizzati nelle simulazioni. Viene visualizzato anche il punto di partenza delle auto.} 
+	\label{fig:tracks}
+\end{figure}
+La durata degli esperimenti è stata impostata a 50 generazioni, in modo che, per ogni tracciato, almeno un'auto raggiunga la fine dello stesso, identificata dall'ultimo checkpoint. Tale valore è stato settato dopo varie prove, ed ha il solo scopo di soddisfare il requisito sopra espresso. Per ogni tracciato sono stati eseguiti cinque test differenti (un singolo test può durare più di 20 minuti, e ci si è limitati a cinque per tracciato per motivi di tempo). In ogni test è stata tenuta traccia dell'\emph{evaluation} media e massima ad ogni generazione. Non è stata utilizzata la fitness poiché, per come è stata calcolata in questo progetto (vedi \autoref{evFitness}), essa esprime solamente di quanto una singola auto è stata migliore (o peggiore) della media della propria generazione, e quindi essa non rappresenta un dato significativo per tutta la generazione. 
+
+I tracciati hanno lunghezze diverse, e quindi le corrispettive \emph{evaluation} sono differenti. Per tale motivo, quando essi vengono confrontati, non si fa riferimento all'\emph{evaluation}, ma alla percentuale di completamento. I grafici dei dati raccolti durante gli esperimenti sono consultabili di seguito.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=130mm]{../results/track01/averageEvaluation.png}
+	\caption{Grafico che mostra l'andamento dell'\emph{evaluation} media durante le 50 generazioni nel tracciato 1 (medio-facile). Tale grafico raggruppa i valori di cinque esperimenti, e per tale motivo i dati sono visualizzati tramite \emph{boxplot}. Si può notare che l'\emph{evaluation} media ha un andamento per lo più crescente al crescere del numero di generazioni, indicando che le auto, mediamente, fanno più strada prima di collidere con i muri del tracciato, al crescere della generazione.}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=130mm]{../results/track02/averageEvaluation.png}
+	\caption{Grafico che mostra l'andamento dell'\emph{evaluation} media durante le 50 generazioni nel tracciato 2 (facile). Come per i grafici precedenti esso raggruppa, tramite \emph{boxplot}, i valori di cinque diversi esperimenti. Anche in questo caso l'andamento dell'\emph{evaluation} media è crescente al crescere delle generazioni, certificando la bontà delle soluzioni adottate. }
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=130mm]{../results/track03/averageEvaluation.png}
+	\caption{Grafico che mostra l'andamento dell'\emph{evaluation} media durante le 50 generazioni nel tracciato 3 (medio-difficile). Come per i grafici precedenti esso raggruppa, tramite \emph{boxplot}, i valori di cinque diversi esperimenti. Anche in questo caso l'andamento dell'\emph{evaluation} media è crescente al crescere delle generazioni, certificando la bontà delle soluzioni adottate. }
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=130mm]{../results/track04/averageEvaluation.png}
+	\caption{Grafico che mostra l'andamento dell'\emph{evaluation} media durante le 50 generazioni nel tracciato 4 (difficile). Come per i grafici precedenti esso raggruppa, tramite \emph{boxplot}, i valori di cinque diversi esperimenti. Anche in questo caso l'andamento dell'\emph{evaluation} media è crescente al crescere delle generazioni, certificando la bontà delle soluzioni adottate. }
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=130mm]{../results/avgEvAtTheEnd.png}
+	\caption{Confronto dei valori di \emph{evaluation} media per i quattro tracciati alla fine dei test (alla 50esima generazione). Come accennato in precedenza, i tracciati hanno lunghezze diverse, e dato che l'\emph{evaluation} è direttamente proporzionale alla distanza percorsa, essi non sono direttamente confrontabili. Per ovviare a questo problema è stata usata la percentuale di completamento del tracciato: al posto di considerare l'\emph{evaluation} si considera il completamento, dato da \emph{evaluation} dell'auto diviso l'\emph{evaluation} massima per un dato circuito. Quello qui rappresentato è, quindi, il livello medio di completamento del tracciato, alla 50esima generazione. Come si può notare, il tracciato 2 (il più semplice) ha una percentuale media di completamento più alta, mentre gli altri tracciati presentano dati simili. Il tracciato 3 presenta una media di completamento molto bassa, a causa della particolare conformazione ``a strettoia'', che non consente a molte auto di superare le prime asperità. Come per gli altri grafici sono raggruppati i risultati di cinque simulazioni, tramite \emph{boxplot}.}
+\end{figure}
+
+
+\section{Conclusioni} \label{conclusions}
+
+Siamo complessivamente soddisfatti del lavoro svolto: grazie all'algoritmo genetico sviluppato, le auto riescono a completare tutti e quatto i circuiti da noi creati. Più nel dettaglio, i più difficili vengono completati, in media, attorno alla trentesima generazione.
+
+I risultati mostrano che il processo evolutivo da noi sviluppato è efficace e la popolazione di auto mostra un miglioramento tendenzialmente costante al crescere del numero di generazioni. Inoltre non è presente \emph{overfitting} dell'algoritmo per una particolare tipologia di tracciato, dato che i tracciati da noi utilizzati sono piuttosto differenti l'uno dall'altro, e per ognuno di essi sono stati ottenuti buoni risultati. In più, i gradi di difficoltà stimati inizialmente per ogni tracciato si sono rivelati corretti anche a fronte dei test sperimentali. 
+
+\subsection{Sviluppi futuri}
+
+Per quanto concerne gli sviluppi futuri, si individuano due modalità principali per estendere il sistema realizzato: modifiche all'algoritmo genetico o aggiunta di nuove funzionalità.
+
+\subsubsection{Algoritmo genetico} 
+
+\begin{itemize}
+	\item \textbf{Tuning dei parametri} : nonostante l'algoritmo genetico realizzato abbia conferito buoni risultati, si potrebbe indagare sulla bontà dei parametri che esso utilizza, elencati in \autoref{valore-dei-parametri}. Siccome l'algoritmo si basa su nozioni probabilistiche, tali parametri svolgono un ruolo fondamentale nella fase di evoluzione. A causa di vincoli temporali non è stato possibile, però, tarare questi parametri nel modo più accurato.
+	\item \textbf{Nuovi operatori di selezione, crossover e mutazione} : le fasi di selezione, crossover e mutazione possono essere svolte in svariati modi, illustrati in parte in \autoref{stato-dell-arte}. Anche in questo caso, a causa di vincoli temporali, sono stati scelti i tre operatori in base alle motivazioni illustrate in \autoref{evolution}. Sarebbe quindi opportuno testare la bontà di strategie differenti per la fase di evoluzione.
+\end{itemize}
+ 
+
+\subsubsection{Nuove funzionalità}
+
+\begin{itemize}
+	\item \textbf{Realizzazione di una gara} : allo stato attuale, l'obiettivo delle auto è quello di completare il tracciato senza dare importanza al tempo impiegato. Nel caso si volesse realizzare una gara tra auto, sarebbe necessario modificare la strategia utilizzata per il calcolo dell'evaluation, tenendo conto anche della velocità media delle auto in modo da premiare quelle più veloci.
+	\item \textbf{Livello di energia} : si può pensare di assegnare un certo livello di energia ad ogni auto che verrà consumato ad ogni movimento. Tale livello di energia non sarà sufficiente per completare il tracciato, ma ogni auto avrà la possibilità, in qualunque momento, di procedere alla ricarica (possibile una sola volta). Durante la ricarica essa rimarrà ferma per un dato periodo di tempo. Quindi, oltre a determinare velocità e direzione del prossimo spostamento, ogni auto dovrà valutare il momento più opportuno per eseguire la ricarica.
+	\item \textbf{Utilizzo di più tipologie di veicoli} : allo stato attuale, è possibile far correre sul tracciato solo un tipo predefinito di auto, avente una certa dimensione e caratterizzata da una propria velocità massima e da un proprio angolo massimo di sterzatura. Sarebbe interessante progettare ed aggiungere nuove tipologie di veicoli, aventi dimensione, velocità massima e sterzatura massima differenti. In aggiunta, ogni tipologia potrebbe essere evoluta in modo completamente indipendente dalle altre. 
+\end{itemize}
+
+\newpage
+\begin{thebibliography}{1}
+	\bibitem{antenna} Gregory S. Hornby, Al Globus, Derek S. Linden, Jason D. Lohn \emph{Automated Antenna Design with Evolutionary Algorithms}, 2006.
+	
+	\bibitem{introGA} Melanie Mitchell, \emph{An Introduction to Genetic Algorithms}, 1998.
+	
+	\bibitem{understandingInt} Rolf Pfeifer, Christian Scheier \emph{Understanding Intelligence}, 1999.
+	
+	\bibitem{fitnessSurvey} Andrew L. Nelson, Gregory J. Barlow, Lefteris Doitsidis \emph{Fitness functions in evolutionary robotics: A survey and analysis}, 2008.
+	
+	\bibitem{GAsurvey} M. Srinivas, L.M. Patnaik \emph{Genetic Algorithms: a Survey}, 1994.
+	
+	\bibitem{SelectionSurvey} Thomas B\"{a}ck, \emph{Selective Pressure in Evolutionary Algorithms: A Characterization of Selection Mechanisms}, 1994.
+	
+	\bibitem{ERWWW}{Stephane Doncieux, Nicolas Bredeche, Jean-Baptiste Mouret, Gusz Eiben, \emph{Evolutionary robotics: what, why, and where to}, 2015} 
+	
+	\bibitem{ERNolfi}{Stefano Nolfi, Dario Floreano, \emph{Evolutionary Robotics: The Biology, Intelligence, and Technology of Self-Organizing Machines.}, 2000}
+	
+	\bibitem{PhysicalRobotEvolution} Dario Floreano, Francesco Mondada \emph{Automatic Creation of an Autonomous Agent: Genetic Evolution of a Neural Network Driven Robot}, 1994.
+	
+	\bibitem{TorcsController} Tae Seong Kim, Joong Chae Na, Kyung Joong Kim \emph{Optimization of an Autonomous Car Controller using a Self-Adaptive Evolutionary Strategy}, 2012.
+	
+	\bibitem{arztRepo}{Samuel Arzt, \emph{Applying Evolutionary Artificial Neural Networks}, 2017 \\ URL:  \url{https://github.com/ArztSamuel/Applying_EANNs}\\ Ultima visita: 8 Luglio 2018.}
+	
+	\bibitem{ourRepo}{Gabriele Graffieti, Alfredo Maffi, Manuel Peruzzi \emph{evolutionary-cars}, 2018 \\ URL:  \url{https://github.com/manuelperuzzi/evolutionary-cars}\\ Ultima visita: 9 Luglio 2018.}
+
+\end{thebibliography}
+
+\end{document}

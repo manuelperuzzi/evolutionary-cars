@@ -61,6 +61,7 @@
     <Compile Include="core\evolution\Genotype.cs" />
     <Compile Include="core\evolution\GeneticAlgorithm.cs" />
     <Compile Include="core\Controller.cs" />
+    <Compile Include="core\utils\FileWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

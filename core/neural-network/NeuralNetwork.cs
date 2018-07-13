@@ -2,20 +2,33 @@
 
 namespace NeuralNetworks
 {
+    /// <summary>
+    /// Class representing a feedforward neural network. It's implemented as a set of NeuralLayers.
+    /// </summary>
     class NeuralNetwork
     {
+
+        /// <value>The neural network layers, stored in an array.</value>
         public NeuralLayer[] Layers
         {
             get;
             private set;
         }
 
+        /// <value>The total amount of weights in the net.</value>
         public uint WeightsCount
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// Creates a biased neural network with the given topology. 
+        /// </summary>
+        /// <param name="topology">The topology of the net, specified as an integer array. The array lenght
+        /// specifies the number of layers the neural network will be made of; each number
+        /// of the array specifies how many neurons it's corresponding layer will have.</param>
+        /// <exception cref="System.ArgumentException">Thrown if the given topology is and empty array.</exception>
         public NeuralNetwork(params uint[] topology)
         {
             if (topology.Length == 0)
@@ -30,6 +43,14 @@ namespace NeuralNetworks
             }
         }
 
+        /// <summary>
+        /// Sets the connections weights, starting from the connections of the first layer first node on a first-to-last
+        /// basis.
+        /// </summary>
+        /// <param name="weights">The weights, all grouped in a monodimensional array. The array must include all
+        /// the biases too.</param>
+        /// <exception cref="System.ArgumentException">Thrown if the number of weights does not match
+        /// the number of connections.</exception>
         public void SetWeights(double[] weights)
         {
             if(weights.Length != WeightsCount)
@@ -45,12 +66,13 @@ namespace NeuralNetworks
             }
         }
 
-        public void SetRandomWeights(double minValue, double maxValue)
-        {
-            for (int i = 0; i < Layers.Length; i++)
-                Layers[i].SetRandomWeights(minValue, maxValue);
-        }
-
+        /// <summary>
+        /// Processes the given input.
+        /// </summary>
+        /// <param name="inputs">The inputs to be processed.</param>
+        /// <exception cref="System.ArgumentException">Thrown if the number of inputs values does not match
+        /// the number of the first layer neurons.</exception>
+        /// <returns>The output produced by the neural network.</returns>
         public double[] ProcessInputs(double[] inputs)
         {
             if (inputs.Length != Layers[0].NeuronCount)
